@@ -1,0 +1,11 @@
+import {
+  "erzhuzi259/moongrammata" @grammata,
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/env",
+  "moonbitlang/core/string",
+}
+
+supported_targets = "+native"
+
+pkgtype(kind: "executable")
+
