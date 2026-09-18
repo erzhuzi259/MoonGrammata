@@ -1,0 +1,8 @@
+.DS_Store
+_build/
+target/
+.mooncakes/
+.scratch/
+*.grammata-corpus.json
+*.grammata-replay.json
+
