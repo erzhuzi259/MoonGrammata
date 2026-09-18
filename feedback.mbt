@@ -6,7 +6,7 @@ pub(all) struct Feature {
 
 ///|
 pub fn feature(domain : String, value : String) -> Feature {
-  { domain, value }
+  { domain, value, }
 }
 
 ///|
@@ -99,8 +99,12 @@ fn compare_string(left : String, right : String) -> Int {
   for index = 0; index < common; index = index + 1 {
     let a = left_bytes[index].to_int()
     let b = right_bytes[index].to_int()
-    if a < b { return -1 }
-    if a > b { return 1 }
+    if a < b {
+      return -1
+    }
+    if a > b {
+      return 1
+    }
   }
   if left_bytes.length() < right_bytes.length() {
     -1
@@ -156,7 +160,9 @@ pub fn feedback_signature(features : Array[Feature]) -> FeedbackSignature {
 }
 
 ///|
-pub fn TargetObservation::signature(self : TargetObservation) -> FeedbackSignature {
+pub fn TargetObservation::signature(
+  self : TargetObservation,
+) -> FeedbackSignature {
   feedback_signature(self.features)
 }
 
@@ -179,9 +185,12 @@ pub fn TargetObservation::failure_fingerprint(
 ) -> FailureFingerprint? {
   match self.disposition {
     Accepted | Rejected(_) => None
-    Failed(kind, detail) => Some(FailureFingerprint(
-      fingerprint_field("kind", kind) + fingerprint_field("detail", detail),
-    ))
+    Failed(kind, detail) =>
+      Some(
+        FailureFingerprint(
+          fingerprint_field("kind", kind) + fingerprint_field("detail", detail),
+        ),
+      )
   }
 }
 
@@ -196,7 +205,9 @@ pub fn TargetObservation::feature_count(self : TargetObservation) -> Int {
 }
 
 ///|
-pub fn TargetObservation::canonical_features(self : TargetObservation) -> Array[Feature] {
+pub fn TargetObservation::canonical_features(
+  self : TargetObservation,
+) -> Array[Feature] {
   sorted_unique_features(self.features)
 }
 
@@ -211,7 +222,7 @@ pub fn Target::new(
   name : String,
   evaluate : (Bytes) -> TargetObservation,
 ) -> Target {
-  { name, evaluate }
+  { name, evaluate, }
 }
 
 ///|
@@ -267,7 +278,7 @@ pub fn FeatureRegistry::observe(
   let signature = feedback_signature(all)
   let signature_count = self.signatures.get(signature).unwrap_or(0)
   self.signatures.set(signature, signature_count + 1)
-  { signature, novel_features: novel, all_features: all }
+  { signature, novel_features: novel, all_features: all, }
 }
 
 ///|

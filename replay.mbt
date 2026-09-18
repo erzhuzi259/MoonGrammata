@@ -115,7 +115,10 @@ pub fn ReplayRecord::encode_json(self : ReplayRecord) -> String {
 }
 
 ///|
-fn replay_object(value : Json, name : String) -> Result[Map[String, Json], ReplayError] {
+fn replay_object(
+  value : Json,
+  name : String,
+) -> Result[Map[String, Json], ReplayError] {
   match value {
     Object(fields) => Ok(fields)
     _ => Err(InvalidField(name + " must be an object"))
@@ -134,7 +137,10 @@ fn replay_required(
 }
 
 ///|
-fn replay_int(fields : Map[String, Json], name : String) -> Result[Int, ReplayError] {
+fn replay_int(
+  fields : Map[String, Json],
+  name : String,
+) -> Result[Int, ReplayError] {
   let value = match replay_required(fields, name) {
     Err(error) => return Err(error)
     Ok(value) => value
@@ -185,7 +191,10 @@ fn hex_value(byte : Byte) -> Int? {
 }
 
 ///|
-fn decode_replay_hex(value : String, maximum : Int) -> Result[Bytes, ReplayError] {
+fn decode_replay_hex(
+  value : String,
+  maximum : Int,
+) -> Result[Bytes, ReplayError] {
   let encoded = @utf8.encode(value)
   if encoded.length() % 2 != 0 {
     return Err(InvalidHexInput(encoded.length()))
@@ -277,16 +286,20 @@ pub fn ReplayRecord::decode_json(
     Ok(value) => value
   }
   let max_depth = match replay_int(budget_fields, "max_depth") {
-    Err(error) => return Err(error); Ok(value) => value
+    Err(error) => return Err(error)
+    Ok(value) => value
   }
   let max_nodes = match replay_int(budget_fields, "max_nodes") {
-    Err(error) => return Err(error); Ok(value) => value
+    Err(error) => return Err(error)
+    Ok(value) => value
   }
   let max_bytes = match replay_int(budget_fields, "max_bytes") {
-    Err(error) => return Err(error); Ok(value) => value
+    Err(error) => return Err(error)
+    Ok(value) => value
   }
   let max_repeat = match replay_int(budget_fields, "max_repeat") {
-    Err(error) => return Err(error); Ok(value) => value
+    Err(error) => return Err(error)
+    Ok(value) => value
   }
   Ok({
     schema_version: version,
@@ -296,7 +309,7 @@ pub fn ReplayRecord::decode_json(
     feedback_signature: feedback,
     failure_fingerprint: failure,
     result_digest,
-    generation_budget: { max_depth, max_nodes, max_bytes, max_repeat },
+    generation_budget: { max_depth, max_nodes, max_bytes, max_repeat, },
   })
 }
 
@@ -311,7 +324,8 @@ pub fn Target::replay(
   let observation = self.run(record.input)
   Ok({
     feedback_matches: observation.signature() == record.feedback_signature,
-    failure_matches: observation.failure_fingerprint() == record.failure_fingerprint,
+    failure_matches: observation.failure_fingerprint() ==
+    record.failure_fingerprint,
     result_matches: observation.result_digest == record.result_digest,
     observation,
   })

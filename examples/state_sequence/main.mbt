@@ -1,10 +1,7 @@
 ///|
 fn operation_grammar() -> @grammata.Grammar {
   let builder = @grammata.GrammarBuilder::new()
-  let operation = builder.dictionary(
-    ["A", "U", "F", "R"],
-    name="operation",
-  )
+  let operation = builder.dictionary(["A", "U", "F", "R"], name="operation")
   let sequence = builder.repeat(
     operation,
     minimum=1,
@@ -69,10 +66,12 @@ fn operation_target() -> @grammata.Target {
         'R' => state = Empty
         _ => return @grammata.rejected("unknown-operation", features~)
       }
-      features.push(@grammata.feature(
-        "transition",
-        before + "-" + operation.to_string() + "->" + state_name(state),
-      ))
+      features.push(
+        @grammata.feature(
+          "transition",
+          before + "-" + operation.to_string() + "->" + state_name(state),
+        ),
+      )
     }
     @grammata.accepted(
       features~,
@@ -102,4 +101,3 @@ fn main {
     println(result.failures[0].encode_json())
   }
 }
-

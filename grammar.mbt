@@ -20,7 +20,7 @@ pub fn alternative(
   weight? : Int = 1,
   label? : String = "",
 ) -> Alternative {
-  { rule, weight, label }
+  { rule, weight, label, }
 }
 
 ///|
@@ -114,7 +114,7 @@ pub struct GrammarBuilder {
 
 ///|
 pub fn GrammarBuilder::new() -> GrammarBuilder {
-  { rules: [], start_rule: None }
+  { rules: [], start_rule: None, }
 }
 
 ///|
@@ -124,7 +124,7 @@ fn GrammarBuilder::append(
   name : String?,
 ) -> RuleId {
   let id = RuleId(self.rules.length())
-  self.rules.push({ id, name, kind })
+  self.rules.push({ id, name, kind, })
   id
 }
 
@@ -280,7 +280,11 @@ fn validate_kind(
         Ok(())
       }
     Dictionary(values) =>
-      if values.is_empty() { Err(EmptyDictionary(owner)) } else { Ok(()) }
+      if values.is_empty() {
+        Err(EmptyDictionary(owner))
+      } else {
+        Ok(())
+      }
     Sequence(children) => {
       for child in children {
         match validate_rule_id(child, owner, count) {
@@ -328,12 +332,18 @@ fn validate_kind(
       }
     }
     Reference(name) =>
-      if names.contains(name) { Ok(()) } else { Err(MissingNamedRule(name)) }
+      if names.contains(name) {
+        Ok(())
+      } else {
+        Err(MissingNamedRule(name))
+      }
   }
 }
 
 ///|
-pub fn GrammarBuilder::build(self : GrammarBuilder) -> Result[Grammar, GrammarError] {
+pub fn GrammarBuilder::build(
+  self : GrammarBuilder,
+) -> Result[Grammar, GrammarError] {
   if self.rules.is_empty() {
     return Err(EmptyGrammar)
   }
@@ -357,10 +367,16 @@ pub fn GrammarBuilder::build(self : GrammarBuilder) -> Result[Grammar, GrammarEr
     return Err(InvalidStartRule(start.0))
   }
   for definition in self.rules {
-    match validate_kind(definition.kind, definition.id.0, self.rules.length(), names) {
+    match
+      validate_kind(
+        definition.kind,
+        definition.id.0,
+        self.rules.length(),
+        names,
+      ) {
       Err(error) => return Err(error)
       Ok(_) => ()
     }
   }
-  Ok({ rules: self.rules.copy(), start, names })
+  Ok({ rules: self.rules.copy(), start, names, })
 }

@@ -32,11 +32,12 @@ test "feature registry reports novelty and frequencies" {
 
 ///|
 test "target wraps a pure controlled evaluator" {
-  let target = Target::new("length", input =>
+  let target = Target::new("length", input => {
     accepted(
       features=[feature("length", input.length().to_string())],
       result_digest=input.length().to_string(),
-    ))
+    )
+  })
   let result = target.run(b"abc")
   assert_eq(target.name(), "length")
   assert_eq(result.result_digest, Some("3"))

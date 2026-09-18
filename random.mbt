@@ -22,7 +22,7 @@ fn normalize_seed(seed : Int64) -> Int64 {
 
 ///|
 pub fn Random::new(seed : Int64) -> Random {
-  { state: normalize_seed(seed), initial_seed: seed, draws: 0 }
+  { state: normalize_seed(seed), initial_seed: seed, draws: 0, }
 }
 
 ///|
@@ -61,7 +61,11 @@ pub fn Random::between(self : Random, minimum : Int, maximum : Int) -> Int {
 }
 
 ///|
-pub fn Random::chance(self : Random, numerator : Int, denominator : Int) -> Bool {
+pub fn Random::chance(
+  self : Random,
+  numerator : Int,
+  denominator : Int,
+) -> Bool {
   if numerator <= 0 || denominator <= 0 {
     false
   } else if numerator >= denominator {
@@ -73,14 +77,15 @@ pub fn Random::chance(self : Random, numerator : Int, denominator : Int) -> Bool
 
 ///|
 pub fn Random::choose_index(self : Random, length : Int) -> Int? {
-  if length <= 0 { None } else { Some(self.below(length)) }
+  if length <= 0 {
+    None
+  } else {
+    Some(self.below(length))
+  }
 }
 
 ///|
-pub fn Random::weighted_index(
-  self : Random,
-  weights : Array[Int],
-) -> Int? {
+pub fn Random::weighted_index(self : Random, weights : Array[Int]) -> Int? {
   let mut total = 0
   for weight in weights {
     if weight > 0 {
@@ -156,7 +161,7 @@ pub fn Random::advance(self : Random, count : Int) -> Unit {
 
 ///|
 pub fn Random::snapshot(self : Random) -> RandomSnapshot {
-  { seed: self.initial_seed, state: self.state, draws: self.draws }
+  { seed: self.initial_seed, state: self.state, draws: self.draws, }
 }
 
 ///|

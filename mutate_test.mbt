@@ -13,11 +13,9 @@ fn mutation_grammar() -> Grammar {
 test "integer mutation chooses declared boundaries" {
   let grammar = mutation_grammar()
   let original = grammar.generate(seed=18L).unwrap()
-  let result = grammar.mutate_with(
-    original,
-    ReplaceIntegerBoundary,
-    seed=7L,
-  ).unwrap()
+  let result = grammar
+    .mutate_with(original, ReplaceIntegerBoundary, seed=7L)
+    .unwrap()
   assert_true(result.tree.render() != original.render())
   assert_true(result.strategy is ReplaceIntegerBoundary)
 }
@@ -26,19 +24,13 @@ test "integer mutation chooses declared boundaries" {
 test "repeat deletion and duplication preserve declared cardinality" {
   let grammar = mutation_grammar()
   let original = grammar.generate(seed=22L).unwrap()
-  let duplicate = grammar.mutate_with(
-    original,
-    DuplicateRepeatedChild,
-    seed=3L,
-  )
+  let duplicate = grammar.mutate_with(original, DuplicateRepeatedChild, seed=3L)
   match duplicate {
     Ok(result) => {
       assert_true(result.tree.node_count() > original.node_count())
-      let deleted = grammar.mutate_with(
-        result.tree,
-        DeleteRepeatedChild,
-        seed=4L,
-      ).unwrap()
+      let deleted = grammar
+        .mutate_with(result.tree, DeleteRepeatedChild, seed=4L)
+        .unwrap()
       assert_true(deleted.tree.node_count() < result.tree.node_count())
     }
     Err(NoApplicableMutation) => ()

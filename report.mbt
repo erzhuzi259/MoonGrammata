@@ -74,11 +74,15 @@ pub fn CampaignResult::markdown_report(
     "| Executions | " + stats.completed_executions.to_string() + " |",
     "| Corpus entries | " + stats.final_corpus.entries.to_string() + " |",
     "| Unique feedback signatures | " +
-      stats.final_corpus.unique_signatures.to_string() + " |",
-    "| Unique features | " + stats.final_corpus.unique_features.to_string() + " |",
+    stats.final_corpus.unique_signatures.to_string() +
+    " |",
+    "| Unique features | " +
+    stats.final_corpus.unique_features.to_string() +
+    " |",
     "| Unique failures | " + stats.unique_failures.to_string() + " |",
     "| Admission rate | " +
-      report_percent(stats.admitted_inputs, stats.completed_executions) + " |",
+    report_percent(stats.admitted_inputs, stats.completed_executions) +
+    " |",
     "| Mutation inputs | " + stats.mutated_inputs.to_string() + " |",
     "| Crossover inputs | " + stats.crossed_inputs.to_string() + " |",
     "| Generated inputs | " + stats.generated_inputs.to_string() + " |",
@@ -213,11 +217,17 @@ fn event_json(event : CampaignEvent) -> String {
 ///|
 pub fn CampaignResult::json_report(self : CampaignResult) -> String {
   let corpus : Array[String] = []
-  for entry in self.corpus { corpus.push(corpus_entry_json(entry)) }
+  for entry in self.corpus {
+    corpus.push(corpus_entry_json(entry))
+  }
   let failures : Array[String] = []
-  for replay in self.failures { failures.push(replay.encode_json()) }
+  for replay in self.failures {
+    failures.push(replay.encode_json())
+  }
   let events : Array[String] = []
-  for event in self.events { events.push(event_json(event)) }
+  for event in self.events {
+    events.push(event_json(event))
+  }
   "{" +
   "\"schema_version\":1," +
   "\"statistics\":" +
@@ -259,8 +269,7 @@ pub fn CampaignResult::strategy_evidence(
 ///|
 pub fn compare_strategies(values : Array[StrategyEvidence]) -> String {
   let lines : Array[String] = [
-    "| Strategy | Executions | Features | Signatures | Failures | Corpus |",
-    "| --- | ---: | ---: | ---: | ---: | ---: |",
+    "| Strategy | Executions | Features | Signatures | Failures | Corpus |", "| --- | ---: | ---: | ---: | ---: | ---: |",
   ]
   for value in values {
     lines.push(

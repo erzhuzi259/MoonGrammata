@@ -1,7 +1,9 @@
 ///|
 fn literal_tree(value : String, id : Int) -> DerivationTree {
   let payload : Array[Byte] = []
-  for byte in @utf8.encode(value) { payload.push(byte) }
+  for byte in @utf8.encode(value) {
+    payload.push(byte)
+  }
   DerivationTree::leaf(id, RuleId(0), LiteralLeaf, payload)
 }
 
@@ -64,23 +66,28 @@ test "corpus enforces input and aggregate limits" {
       literal_tree("cde", 1),
       accepted(features=[feature("new", "x")]),
       Generated(2L),
-    ) is Rejected(ByteCapacity),
+    )
+    is Rejected(ByteCapacity),
   )
 }
 
 ///|
 test "corpus statistics track retained evidence" {
   let corpus = Corpus::new()
-  ignore(corpus.consider(
-    literal_tree("a", 0),
-    accepted(features=[feature("path", "one")]),
-    Seeded(1L),
-  ))
-  ignore(corpus.consider(
-    literal_tree("b", 1),
-    failed("panic", "x", features=[feature("path", "two")]),
-    Generated(2L),
-  ))
+  ignore(
+    corpus.consider(
+      literal_tree("a", 0),
+      accepted(features=[feature("path", "one")]),
+      Seeded(1L),
+    ),
+  )
+  ignore(
+    corpus.consider(
+      literal_tree("b", 1),
+      failed("panic", "x", features=[feature("path", "two")]),
+      Generated(2L),
+    ),
+  )
   let stats = corpus.statistics()
   assert_eq(stats.entries, 2)
   assert_eq(stats.failures, 1)
@@ -88,4 +95,3 @@ test "corpus statistics track retained evidence" {
   assert_eq(stats.unique_features, 2)
   assert_eq(stats.unique_failures, 1)
 }
-

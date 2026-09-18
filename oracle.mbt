@@ -25,9 +25,17 @@ fn differential_mismatch(
   let digest_differs = left.result_digest != right.result_digest
   match policy {
     CompareDisposition =>
-      if disposition_differs { Some("disposition") } else { None }
+      if disposition_differs {
+        Some("disposition")
+      } else {
+        None
+      }
     CompareResultDigest =>
-      if digest_differs { Some("result-digest") } else { None }
+      if digest_differs {
+        Some("result-digest")
+      } else {
+        None
+      }
     CompareDispositionAndDigest =>
       if disposition_differs {
         Some("disposition")
@@ -66,16 +74,18 @@ pub fn differential_target(
     let right_result = right.run(input)
     let features = merged_features(left_result, right_result)
     match differential_mismatch(left_result, right_result, policy) {
-      None => accepted(
-        features~,
-        result_digest=left_result.result_digest.unwrap_or(""),
-        cost_class=left_result.cost_class.max(right_result.cost_class),
-      )
-      Some(reason) => failed(
-        "differential-mismatch",
-        reason + " between " + left.name() + " and " + right.name(),
-        features~,
-      )
+      None =>
+        accepted(
+          features~,
+          result_digest=left_result.result_digest.unwrap_or(""),
+          cost_class=left_result.cost_class.max(right_result.cost_class),
+        )
+      Some(reason) =>
+        failed(
+          "differential-mismatch",
+          reason + " between " + left.name() + " and " + right.name(),
+          features~,
+        )
     }
   })
 }
@@ -93,7 +103,7 @@ pub fn MetamorphicTransform::new(
   apply : (Bytes) -> Bytes,
   relation : (TargetObservation, TargetObservation) -> Bool,
 ) -> MetamorphicTransform {
-  { name, apply, relation }
+  { name, apply, relation, }
 }
 
 ///|
@@ -106,11 +116,9 @@ pub fn same_digest_transform(
   name : String,
   apply : (Bytes) -> Bytes,
 ) -> MetamorphicTransform {
-  MetamorphicTransform::new(
-    name,
-    apply,
-    (before, after) => before.result_digest == after.result_digest,
-  )
+  MetamorphicTransform::new(name, apply, (before, after) => {
+    before.result_digest == after.result_digest
+  })
 }
 
 ///|
@@ -118,12 +126,10 @@ pub fn same_disposition_transform(
   name : String,
   apply : (Bytes) -> Bytes,
 ) -> MetamorphicTransform {
-  MetamorphicTransform::new(
-    name,
-    apply,
-    (before, after) =>
-      disposition_class(before.disposition) == disposition_class(after.disposition),
-  )
+  MetamorphicTransform::new(name, apply, (before, after) => {
+    disposition_class(before.disposition) ==
+    disposition_class(after.disposition)
+  })
 }
 
 ///|
@@ -142,17 +148,12 @@ pub fn metamorphic_target(
       let transformed_input = (transform.apply)(input)
       let transformed = base.run(transformed_input)
       for item in transformed.canonical_features() {
-        features.push(feature(
-          "transform/" + transform.name + "/" + item.domain,
-          item.value,
-        ))
+        features.push(
+          feature("transform/" + transform.name + "/" + item.domain, item.value),
+        )
       }
       if !(transform.relation)(baseline, transformed) {
-        return failed(
-          "metamorphic-violation",
-          transform.name,
-          features~,
-        )
+        return failed("metamorphic-violation", transform.name, features~)
       }
     }
     accepted(
@@ -201,4 +202,3 @@ pub fn agreement_target(
     }
   })
 }
-

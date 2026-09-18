@@ -41,7 +41,7 @@ pub fn EnergyScheduler::new(
   seed : Int64,
   config? : ScheduleConfig = ScheduleConfig::default(),
 ) -> EnergyScheduler {
-  { config, random: Random::new(seed), rounds: 0 }
+  { config, random: Random::new(seed), rounds: 0, }
 }
 
 ///|
@@ -174,14 +174,18 @@ pub fn EnergyScheduler::rank(
     let mut inserted = false
     for index = 0; index < ordered.length(); index = index + 1 {
       if item.energy > ordered[index].energy ||
-        (item.energy == ordered[index].energy && item.entry_id < ordered[index].entry_id) {
+        (
+          item.energy == ordered[index].energy &&
+          item.entry_id < ordered[index].entry_id
+        ) {
         ordered.insert(index, item)
         inserted = true
         break
       }
     }
-    if !inserted { ordered.push(item) }
+    if !inserted {
+      ordered.push(item)
+    }
   }
   ordered
 }
-

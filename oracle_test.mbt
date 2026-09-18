@@ -1,27 +1,36 @@
 ///|
 test "differential target reports semantic divergence" {
-  let left = Target::new("left", input =>
-    accepted(result_digest=input.length().to_string()))
-  let right = Target::new("right", input =>
-    accepted(result_digest=(input.length() + 1).to_string()))
+  let left = Target::new("left", input => {
+    accepted(result_digest=input.length().to_string())
+  })
+  let right = Target::new("right", input => {
+    accepted(result_digest=(input.length() + 1).to_string())
+  })
   let oracle = differential_target("diff", left, right)
   let result = oracle.run(b"abc")
   assert_true(result.is_failure())
   assert_true(
-    result.failure_fingerprint().unwrap().value().contains("differential-mismatch"),
+    result
+    .failure_fingerprint()
+    .unwrap()
+    .value()
+    .contains("differential-mismatch"),
   )
 }
 
 ///|
 test "metamorphic target validates declared relations" {
-  let length = Target::new("length", input =>
-    accepted(result_digest=input.length().to_string()))
+  let length = Target::new("length", input => {
+    accepted(result_digest=input.length().to_string())
+  })
   let identity = same_digest_transform("identity", input => input)
   let valid = metamorphic_target("valid", length, [identity])
   assert_false(valid.run(b"abc").is_failure())
   let append = same_digest_transform("append", input => {
     let values : Array[Byte] = []
-    for byte in input { values.push(byte) }
+    for byte in input {
+      values.push(byte)
+    }
     values.push(0)
     Bytes::from_array(values)
   })
@@ -39,4 +48,3 @@ test "agreement target accepts a quorum" {
   assert_false(result.is_failure())
   assert_eq(result.result_digest, Some("accepted|yes"))
 }
-

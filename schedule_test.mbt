@@ -1,11 +1,13 @@
 ///|
 test "scheduler prefers unseen and rare-feature entries" {
   let corpus = Corpus::new()
-  ignore(corpus.consider(
-    literal_tree("a", 0),
-    accepted(features=[feature("common", "x")]),
-    Seeded(1L),
-  ))
+  ignore(
+    corpus.consider(
+      literal_tree("a", 0),
+      accepted(features=[feature("common", "x")]),
+      Seeded(1L),
+    ),
+  )
   let second = accepted(features=[feature("rare", "y")])
   ignore(corpus.consider(literal_tree("b", 1), second, Generated(2L)))
   corpus.entry(0).unwrap().record_execution()
@@ -21,11 +23,13 @@ test "scheduler selections are deterministic for a seed" {
   fn populated() -> Corpus {
     let corpus = Corpus::new()
     ignore(corpus.consider(literal_tree("a", 0), accepted(), Seeded(1L)))
-    ignore(corpus.consider(
-      literal_tree("b", 1),
-      accepted(features=[feature("path", "b")]),
-      Generated(2L),
-    ))
+    ignore(
+      corpus.consider(
+        literal_tree("b", 1),
+        accepted(features=[feature("path", "b")]),
+        Generated(2L),
+      ),
+    )
     corpus
   }
   let left_corpus = populated()
@@ -47,4 +51,3 @@ test "scheduler handles empty corpus" {
   let scheduler = EnergyScheduler::new(1L)
   assert_eq(scheduler.select(Corpus::new()), None)
 }
-

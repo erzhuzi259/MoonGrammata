@@ -39,9 +39,7 @@ test "analysis rejects recursion without a terminating path" {
   let reference = builder.reference("loop")
   let cycle = builder.sequence([reference], name="loop")
   let grammar = builder.set_start(cycle).build().unwrap()
-  assert_true(
-    grammar.validate_productivity() is Err(UnproductiveStartRule(_)),
-  )
+  assert_true(grammar.validate_productivity() is Err(UnproductiveStartRule(_)))
 }
 
 ///|

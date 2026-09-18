@@ -20,18 +20,12 @@ test "crossover rejects unrelated trees" {
 
 ///|
 test "crossover enforces output budgets" {
-  let left = DerivationTree::branch(
-    0,
-    RuleId(0),
-    SequenceNode,
-    [DerivationTree::leaf(1, RuleId(1), LiteralLeaf, [1])],
-  )
-  let right = DerivationTree::branch(
-    0,
-    RuleId(0),
-    SequenceNode,
-    [DerivationTree::leaf(1, RuleId(1), LiteralLeaf, [1, 2, 3, 4])],
-  )
+  let left = DerivationTree::branch(0, RuleId(0), SequenceNode, [
+    DerivationTree::leaf(1, RuleId(1), LiteralLeaf, [1]),
+  ])
+  let right = DerivationTree::branch(0, RuleId(0), SequenceNode, [
+    DerivationTree::leaf(1, RuleId(1), LiteralLeaf, [1, 2, 3, 4]),
+  ])
   let config : CrossoverConfig = {
     ..CrossoverConfig::default(),
     maximum_output_bytes: 2,
@@ -41,4 +35,3 @@ test "crossover enforces output budgets" {
     is Err(CrossoverBudgetExceeded("bytes", 2)),
   )
 }
-

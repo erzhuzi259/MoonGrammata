@@ -50,7 +50,10 @@ fn Grammar::resolved_reference(self : Grammar, name : String) -> RuleId {
 }
 
 ///|
-fn Grammar::children_of(self : Grammar, definition : RuleDefinition) -> Array[RuleId] {
+fn Grammar::children_of(
+  self : Grammar,
+  definition : RuleDefinition,
+) -> Array[RuleId] {
   match definition.kind {
     Literal(_) | Bytes(_) | Integer(_, _) | Dictionary(_) => []
     Sequence(children) => children.copy()
@@ -402,10 +405,18 @@ pub fn Grammar::analyze(self : Grammar) -> GrammarAnalysis {
       definition.id,
       FixedArray::make(count, false),
     )
-    if reachable[index] { reachable_count += 1 }
-    if recursive { recursive_count += 1 }
-    if nullable[index] { nullable_count += 1 }
-    if productive[index] { productive_count += 1 }
+    if reachable[index] {
+      reachable_count += 1
+    }
+    if recursive {
+      recursive_count += 1
+    }
+    if nullable[index] {
+      nullable_count += 1
+    }
+    if productive[index] {
+      productive_count += 1
+    }
     properties.push({
       rule: definition.id,
       reachable: reachable[index],
@@ -442,4 +453,3 @@ pub fn Grammar::validate_productivity(
   }
   Ok(analysis)
 }
-

@@ -27,7 +27,7 @@ pub fn DerivationTree::leaf(
   kind : DerivationKind,
   payload : Array[Byte],
 ) -> DerivationTree {
-  { node_id, rule, kind, payload: payload.copy(), children: [] }
+  { node_id, rule, kind, payload: payload.copy(), children: [], }
 }
 
 ///|
@@ -37,7 +37,7 @@ pub fn DerivationTree::branch(
   kind : DerivationKind,
   children : Array[DerivationTree],
 ) -> DerivationTree {
-  { node_id, rule, kind, payload: [], children: children.copy() }
+  { node_id, rule, kind, payload: [], children: children.copy(), }
 }
 
 ///|
@@ -89,7 +89,7 @@ pub fn DerivationTree::render(self : DerivationTree) -> Bytes {
 pub fn DerivationTree::render_text(
   self : DerivationTree,
 ) -> Result[String, String] {
-  try Ok(@utf8.decode(self.render())) catch {
+  Ok(@utf8.decode(self.render())) catch {
     _ => Err("derivation output is not valid UTF-8")
   }
 }
@@ -122,7 +122,9 @@ pub fn DerivationTree::depth(self : DerivationTree) -> Int {
 }
 
 ///|
-pub fn DerivationTree::descendants(self : DerivationTree) -> Array[DerivationTree] {
+pub fn DerivationTree::descendants(
+  self : DerivationTree,
+) -> Array[DerivationTree] {
   let result : Array[DerivationTree] = [self]
   for child in self.children {
     for descendant in child.descendants() {
@@ -147,7 +149,10 @@ pub fn DerivationTree::nodes_for_rule(
 }
 
 ///|
-pub fn DerivationTree::find(self : DerivationTree, node_id : Int) -> DerivationTree? {
+pub fn DerivationTree::find(
+  self : DerivationTree,
+  node_id : Int,
+) -> DerivationTree? {
   if self.node_id == node_id {
     return Some(self)
   }
@@ -173,7 +178,7 @@ pub fn DerivationTree::replace(
   for child in self.children {
     updated.push(child.replace(node_id, replacement))
   }
-  { ..self, children: updated }
+  { ..self, children: updated, }
 }
 
 ///|
@@ -190,7 +195,7 @@ pub fn DerivationTree::without_child(
       updated.push(child)
     }
   }
-  Some({ ..self, children: updated })
+  Some({ ..self, children: updated, })
 }
 
 ///|
@@ -203,7 +208,7 @@ pub fn DerivationTree::renumber(self : DerivationTree) -> DerivationTree {
     for child in node.children {
       children.push(visit(child, next))
     }
-    { ..node, node_id: id, children }
+    { ..node, node_id: id, children, }
   }
   visit(self, next)
 }

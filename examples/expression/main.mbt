@@ -7,11 +7,7 @@ fn expression_grammar() -> @grammata.Grammar {
   let close = builder.literal(")")
   let expression_ref = builder.reference("expression")
   let binary = builder.sequence([
-    open,
-    expression_ref,
-    operator_rule,
-    expression_ref,
-    close,
+    open, expression_ref, operator_rule, expression_ref, close,
   ])
   let expression = builder.choice(
     [
@@ -26,7 +22,9 @@ fn expression_grammar() -> @grammata.Grammar {
 ///|
 fn contains_division_by_zero(text : String) -> Bool {
   let data = @utf8.encode(text)
-  if data.length() < 2 { return false }
+  if data.length() < 2 {
+    return false
+  }
   for index = 0; index + 1 < data.length(); index = index + 1 {
     if data[index].to_int() == '/'.to_int() &&
       data[index + 1].to_int() == '0'.to_int() {
@@ -73,10 +71,7 @@ fn expression_target() -> @grammata.Target {
     if contains_division_by_zero(text) {
       @grammata.failed("arithmetic", "division-by-zero", features~)
     } else {
-      @grammata.accepted(
-        features~,
-        result_digest=input.length().to_string(),
-      )
+      @grammata.accepted(features~, result_digest=input.length().to_string())
     }
   })
 }

@@ -1,10 +1,8 @@
 ///|
 test "replay records round trip arbitrary binary input" {
-  let observation = failed(
-    "panic",
-    "binary",
-    features=[feature("stage", "decode")],
-  )
+  let observation = failed("panic", "binary", features=[
+    feature("stage", "decode"),
+  ])
   let record = ReplayRecord::new(
     target_name="decoder",
     seed=-88L,
@@ -17,11 +15,12 @@ test "replay records round trip arbitrary binary input" {
 
 ///|
 test "target replay checks all stable observations" {
-  let target = Target::new("length", input =>
+  let target = Target::new("length", input => {
     accepted(
       features=[feature("length", input.length().to_string())],
       result_digest=input.length().to_string(),
-    ))
+    )
+  })
   let observation = target.run(b"abc")
   let record = ReplayRecord::new(
     target_name="length",
@@ -60,4 +59,3 @@ test "replay refuses a different target identity" {
   let target = Target::new("two", _ => accepted())
   assert_true(target.replay(record) is Err(TargetNameMismatch("one", "two")))
 }
-

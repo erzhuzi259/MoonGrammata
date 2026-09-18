@@ -237,8 +237,9 @@ pub fn Corpus::consider(
     None => ()
   }
   let already_had_signature = self.registry.signature_frequency(
-    observation.signature(),
-  ) > 0
+      observation.signature(),
+    ) >
+    0
   let feature_delta = self.registry.observe(observation)
   let failure_is_novel = match fingerprint {
     None => false

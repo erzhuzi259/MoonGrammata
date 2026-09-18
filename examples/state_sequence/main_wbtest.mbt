@@ -3,7 +3,9 @@ test "state sequence campaign finds use after free" {
   let result = run_state_sequence_demo(1000)
   assert_true(result.statistics.unique_failures >= 1)
   let replay = result.failures[0]
-  assert_true(replay.failure_fingerprint.unwrap().value().contains("use-after-free"))
+  assert_true(
+    replay.failure_fingerprint.unwrap().value().contains("use-after-free"),
+  )
   assert_true(operation_target().replay(replay).unwrap().matches())
 }
 
@@ -19,4 +21,3 @@ test "operation grammar emits only declared commands" {
     }
   }
 }
-

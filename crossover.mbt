@@ -93,12 +93,13 @@ pub fn crossover(
     }
     match within_crossover_budget(candidate, config) {
       Err(error) => budget_error = Some(error)
-      Ok(_) => return Ok({
-        tree: candidate,
-        recipient_node: left.node_id,
-        donor_node: right.node_id,
-        rule: left.rule,
-      })
+      Ok(_) =>
+        return Ok({
+          tree: candidate,
+          recipient_node: left.node_id,
+          donor_node: right.node_id,
+          rule: left.rule,
+        })
     }
   }
   match budget_error {
@@ -114,10 +115,13 @@ pub fn crossover_compatible_rule_count(
 ) -> Int {
   let seen : @hashmap.HashMap[RuleId, Unit] = @hashmap.HashMap([])
   let right_rules : @hashmap.HashMap[RuleId, Unit] = @hashmap.HashMap([])
-  for node in right.descendants() { right_rules.set(node.rule, ()) }
+  for node in right.descendants() {
+    right_rules.set(node.rule, ())
+  }
   for node in left.descendants() {
-    if right_rules.contains(node.rule) { seen.set(node.rule, ()) }
+    if right_rules.contains(node.rule) {
+      seen.set(node.rule, ())
+    }
   }
   seen.length()
 }
-

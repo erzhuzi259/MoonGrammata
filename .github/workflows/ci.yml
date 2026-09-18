@@ -1,0 +1,76 @@
+name: MoonGrammata CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install MoonBit (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          curl -fsSL https://cli.moonbitlang.com/install/unix.sh | bash
+          echo "$HOME/.moon/bin" >> "$GITHUB_PATH"
+
+      - name: Install MoonBit (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          irm https://cli.moonbitlang.com/install/powershell.ps1 | iex
+          "$env:USERPROFILE\.moon\bin" >> $env:GITHUB_PATH
+
+      - name: Toolchain
+        run: moon version --all
+
+      - name: Resolve dependencies
+        run: moon update
+
+      - name: Check every backend
+        run: moon check --target all --deny-warn
+
+      - name: Build every backend
+        run: moon build --target all --deny-warn
+
+      - name: Test every backend
+        run: moon test --target all --deny-warn
+
+      - name: Verify formatting
+        run: |
+          moon fmt
+          git diff --exit-code
+
+      - name: Verify public interfaces
+        run: |
+          moon info
+          git diff --exit-code
+
+      - name: Run expression example
+        run: moon run --target native examples/expression
+
+      - name: Run binary TLV example
+        run: moon run --target native examples/tlv
+
+      - name: Run state-sequence example
+        run: moon run --target native examples/state_sequence
+
+      - name: Run CLI smoke command
+        run: moon run --target native cmd/moongrammata -- sample 3 20260918
+
+      - name: Verify publish archive
+        run: moon publish --dry-run
+

@@ -54,7 +54,9 @@ test "binary leaves preserve arbitrary byte values" {
   assert_eq(tree.byte_length(), 3)
   assert_eq(tree.render().length(), 3)
   for value in tree.render() {
-    assert_true(value.to_int() == 0 || value.to_int() == 127 || value.to_int() == 255)
+    assert_true(
+      value.to_int() == 0 || value.to_int() == 127 || value.to_int() == 255,
+    )
   }
 }
 
@@ -64,16 +66,12 @@ test "generation rejects impossible resource budgets" {
   let literal = builder.literal("abcdef")
   let grammar = builder.set_start(literal).build().unwrap()
   assert_true(
-    grammar.generate(
-      seed=1L,
-      budget=GenerationBudget::new(max_bytes=3),
-    ) is Err(ByteBudgetExceeded(3)),
+    grammar.generate(seed=1L, budget=GenerationBudget::new(max_bytes=3))
+    is Err(ByteBudgetExceeded(3)),
   )
   assert_true(
-    grammar.generate(
-      seed=1L,
-      budget=GenerationBudget::new(max_nodes=0),
-    ) is Err(InvalidBudget(_)),
+    grammar.generate(seed=1L, budget=GenerationBudget::new(max_nodes=0))
+    is Err(InvalidBudget(_)),
   )
 }
 

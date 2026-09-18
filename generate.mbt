@@ -8,7 +8,7 @@ pub(all) struct GenerationBudget {
 
 ///|
 pub fn GenerationBudget::default() -> GenerationBudget {
-  { max_depth: 32, max_nodes: 512, max_bytes: 16384, max_repeat: 64 }
+  { max_depth: 32, max_nodes: 512, max_bytes: 16384, max_repeat: 64, }
 }
 
 ///|
@@ -18,7 +18,7 @@ pub fn GenerationBudget::new(
   max_bytes? : Int = 16384,
   max_repeat? : Int = 64,
 ) -> GenerationBudget {
-  { max_depth, max_nodes, max_bytes, max_repeat }
+  { max_depth, max_nodes, max_bytes, max_repeat, }
 }
 
 ///|
@@ -43,7 +43,9 @@ priv struct GenerationState {
 }
 
 ///|
-fn GenerationBudget::validate(self : GenerationBudget) -> Result[Unit, GenerationError] {
+fn GenerationBudget::validate(
+  self : GenerationBudget,
+) -> Result[Unit, GenerationError] {
   if self.max_depth <= 0 {
     Err(InvalidBudget("max_depth must be positive"))
   } else if self.max_nodes <= 0 {
@@ -97,11 +99,7 @@ fn string_bytes(value : String) -> Array[Byte] {
 }
 
 ///|
-fn viable_child(
-  state : GenerationState,
-  rule : RuleId,
-  depth : Int,
-) -> Bool {
+fn viable_child(state : GenerationState, rule : RuleId, depth : Int) -> Bool {
   let properties = state.analysis.properties(rule).unwrap()
   if !properties.productive {
     return false
@@ -200,12 +198,14 @@ fn generate_rule(
         Err(error) => return Err(error)
         Ok(value) => value
       }
-      Ok(DerivationTree::branch(
-        node_id,
-        rule,
-        ChoiceNode(selected, item.label),
-        [child],
-      ))
+      Ok(
+        DerivationTree::branch(
+          node_id,
+          rule,
+          ChoiceNode(selected, item.label),
+          [child],
+        ),
+      )
     }
     Repeat(child_rule, minimum, maximum) => {
       let cap = maximum.min(state.budget.max_repeat)
@@ -246,12 +246,7 @@ fn generate_rule(
       } else {
         []
       }
-      Ok(DerivationTree::branch(
-        node_id,
-        rule,
-        OptionalNode(present),
-        children,
-      ))
+      Ok(DerivationTree::branch(node_id, rule, OptionalNode(present), children))
     }
     Reference(name) => {
       let target = grammar.resolve(name).unwrap()
@@ -259,12 +254,7 @@ fn generate_rule(
         Err(error) => return Err(error)
         Ok(value) => value
       }
-      Ok(DerivationTree::branch(
-        node_id,
-        rule,
-        ReferenceNode(name),
-        [child],
-      ))
+      Ok(DerivationTree::branch(node_id, rule, ReferenceNode(name), [child]))
     }
   }
 }

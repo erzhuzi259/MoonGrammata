@@ -1,8 +1,9 @@
 ///|
 test "campaign reports are deterministic valid artifacts" {
   let grammar = mutation_grammar()
-  let target = Target::new("report", input =>
-    accepted(features=[feature("size", input.length().to_string())]))
+  let target = Target::new("report", input => {
+    accepted(features=[feature("size", input.length().to_string())])
+  })
   let config : CampaignConfig = {
     ..CampaignConfig::default(seed=7L),
     executions: 20,
@@ -39,4 +40,3 @@ test "strategy comparison renders evidence table" {
   ])
   assert_true(text.contains("| structured | 100 | 12 | 9 | 2 | 16 |"))
 }
-

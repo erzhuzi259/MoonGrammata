@@ -15,11 +15,14 @@ test "expression grammar emits balanced inputs" {
     let text = tree.render_text().unwrap()
     let mut balance = 0
     for byte in @utf8.encode(text) {
-      if byte.to_int() == '('.to_int() { balance += 1 }
-      if byte.to_int() == ')'.to_int() { balance -= 1 }
+      if byte.to_int() == '('.to_int() {
+        balance += 1
+      }
+      if byte.to_int() == ')'.to_int() {
+        balance -= 1
+      }
       assert_true(balance >= 0)
     }
     assert_eq(balance, 0)
   }
 }
-

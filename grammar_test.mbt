@@ -40,7 +40,5 @@ test "builder rejects duplicate names and invalid byte sets" {
   )
   let bytes = GrammarBuilder::new()
   let invalid = bytes.bytes([0, 256])
-  assert_true(
-    bytes.set_start(invalid).build() is Err(InvalidByteValue(0, 256)),
-  )
+  assert_true(bytes.set_start(invalid).build() is Err(InvalidByteValue(0, 256)))
 }

@@ -47,13 +47,18 @@ fn filtered_nodes(
 ) -> Array[DerivationTree] {
   let result : Array[DerivationTree] = []
   for node in tree.descendants() {
-    if predicate(node) { result.push(node) }
+    if predicate(node) {
+      result.push(node)
+    }
   }
   result
 }
 
 ///|
-fn choose_node(random : Random, nodes : Array[DerivationTree]) -> DerivationTree? {
+fn choose_node(
+  random : Random,
+  nodes : Array[DerivationTree],
+) -> DerivationTree? {
   match random.choose_index(nodes.length()) {
     None => None
     Some(index) => Some(nodes[index])
@@ -76,7 +81,7 @@ fn finalize_mutation(
     renumbered.node_count() == original.node_count() {
     Err(NoApplicableMutation)
   } else {
-    Ok({ tree: renumbered, strategy, changed_node: node, detail })
+    Ok({ tree: renumbered, strategy, changed_node: node, detail, })
   }
 }
 
@@ -89,11 +94,12 @@ fn regenerate_subtree(
 ) -> Result[MutationResult, MutationError] {
   let nodes = original.descendants()
   let selected = choose_node(random, nodes).unwrap()
-  let generated = match grammar.generate_from(
-    selected.rule,
-    seed=Int64::from_int(random.next_raw()),
-    budget=config.budget,
-  ) {
+  let generated = match
+    grammar.generate_from(
+      selected.rule,
+      seed=Int64::from_int(random.next_raw()),
+      budget=config.budget,
+    ) {
     Err(error) => return Err(GenerationFailed(error))
     Ok(value) => value
   }
@@ -130,7 +136,9 @@ fn delete_repeated_child(
   let removed = random.below(selected.children.length())
   let children : Array[DerivationTree] = []
   for index, child in selected.children {
-    if index != removed { children.push(child) }
+    if index != removed {
+      children.push(child)
+    }
   }
   let replacement = {
     ..selected,
@@ -164,21 +172,23 @@ fn toggle_optional(
     Some(value) => value
   }
   let replacement = match selected.kind {
-    OptionalNode(true) => { ..selected, kind: OptionalNode(false), children: [] }
+    OptionalNode(true) =>
+      { ..selected, kind: OptionalNode(false), children: [], }
     OptionalNode(false) => {
       let child_rule = match grammar.rule(selected.rule).unwrap().kind {
         Optional(child, _) => child
         _ => return Err(NoApplicableMutation)
       }
-      let child = match grammar.generate_from(
-        child_rule,
-        seed=Int64::from_int(random.next_raw()),
-        budget=config.budget,
-      ) {
+      let child = match
+        grammar.generate_from(
+          child_rule,
+          seed=Int64::from_int(random.next_raw()),
+          budget=config.budget,
+        ) {
         Err(error) => return Err(GenerationFailed(error))
         Ok(value) => value
       }
-      { ..selected, kind: OptionalNode(true), children: [child] }
+      { ..selected, kind: OptionalNode(true), children: [child], }
     }
     _ => return Err(NoApplicableMutation)
   }
@@ -227,12 +237,19 @@ fn replace_integer_boundary(
     Integer(minimum, maximum) => (minimum, maximum)
     _ => return Err(NoApplicableMutation)
   }
-  let old = match selected.kind { IntegerLeaf(value) => value; _ => 0 }
+  let old = match selected.kind {
+    IntegerLeaf(value) => value
+    _ => 0
+  }
   let choices : Array[Int] = []
   for value in integer_boundaries(minimum, maximum) {
-    if value != old { choices.push(value) }
+    if value != old {
+      choices.push(value)
+    }
   }
-  if choices.is_empty() { return Err(NoApplicableMutation) }
+  if choices.is_empty() {
+    return Err(NoApplicableMutation)
+  }
   let value = choices[random.below(choices.length())]
   let replacement = DerivationTree::leaf(
     selected.node_id,
@@ -266,10 +283,17 @@ fn replace_dictionary_entry(
     Dictionary(values) => values
     _ => return Err(NoApplicableMutation)
   }
-  let old = match selected.kind { DictionaryLeaf(value) => value; _ => 0 }
-  if values.length() <= 1 { return Err(NoApplicableMutation) }
+  let old = match selected.kind {
+    DictionaryLeaf(value) => value
+    _ => 0
+  }
+  if values.length() <= 1 {
+    return Err(NoApplicableMutation)
+  }
   let mut index = random.below(values.length() - 1)
-  if index >= old { index += 1 }
+  if index >= old {
+    index += 1
+  }
   let replacement = DerivationTree::leaf(
     selected.node_id,
     selected.rule,
@@ -289,8 +313,7 @@ fn replace_dictionary_entry(
 ///|
 fn duplicable_repeat(grammar : Grammar, node : DerivationTree) -> Bool {
   match (node.kind, grammar.rule(node.rule).unwrap().kind) {
-    (RepeatNode(count), Repeat(_, _, maximum)) =>
-      count > 0 && count < maximum
+    (RepeatNode(count), Repeat(_, _, maximum)) => count > 0 && count < maximum
     _ => false
   }
 }
@@ -338,9 +361,12 @@ pub fn Grammar::mutate_with(
     RegenerateSubtree => regenerate_subtree(self, tree, random, config)
     DeleteRepeatedChild => delete_repeated_child(self, tree, random, config)
     ToggleOptional => toggle_optional(self, tree, random, config)
-    ReplaceIntegerBoundary => replace_integer_boundary(self, tree, random, config)
-    ReplaceDictionaryEntry => replace_dictionary_entry(self, tree, random, config)
-    DuplicateRepeatedChild => duplicate_repeated_child(self, tree, random, config)
+    ReplaceIntegerBoundary =>
+      replace_integer_boundary(self, tree, random, config)
+    ReplaceDictionaryEntry =>
+      replace_dictionary_entry(self, tree, random, config)
+    DuplicateRepeatedChild =>
+      duplicate_repeated_child(self, tree, random, config)
   }
 }
 
@@ -363,12 +389,13 @@ pub fn Grammar::mutate(
   let limit = config.attempts.max(1).min(256)
   for attempt = 0; attempt < limit; attempt = attempt + 1 {
     let strategy = strategies[order[attempt % order.length()]]
-    match self.mutate_with(
-      tree,
-      strategy,
-      seed=seed + Int64::from_int(attempt * 104729),
-      config~,
-    ) {
+    match
+      self.mutate_with(
+        tree,
+        strategy,
+        seed=seed + Int64::from_int(attempt * 104729),
+        config~,
+      ) {
       Ok(result) => return Ok(result)
       Err(NoApplicableMutation) => ()
       Err(_) => ()
@@ -376,4 +403,3 @@ pub fn Grammar::mutate(
   }
   Err(NoApplicableMutation)
 }
-

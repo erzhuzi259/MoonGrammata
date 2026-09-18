@@ -73,8 +73,10 @@ priv struct ReductionCandidate {
 ///|
 fn strictly_smaller(left : DerivationTree, right : DerivationTree) -> Bool {
   left.byte_length() < right.byte_length() ||
-  (left.byte_length() == right.byte_length() &&
-  left.node_count() < right.node_count())
+  (
+    left.byte_length() == right.byte_length() &&
+    left.node_count() < right.node_count()
+  )
 }
 
 ///|
@@ -102,17 +104,17 @@ fn repeat_reductions(
     Repeat(_, minimum, _) => minimum
     _ => return
   }
-  if node.children.length() <= minimum { return }
+  if node.children.length() <= minimum {
+    return
+  }
   for removed = 0; removed < node.children.length(); removed = removed + 1 {
     let children : Array[DerivationTree] = []
     for index, child in node.children {
-      if index != removed { children.push(child) }
+      if index != removed {
+        children.push(child)
+      }
     }
-    let replacement = {
-      ..node,
-      kind: RepeatNode(children.length()),
-      children,
-    }
+    let replacement = { ..node, kind: RepeatNode(children.length()), children, }
     insert_candidate(output, {
       tree: root.replace(node.node_id, replacement).renumber(),
       kind: RemoveRepeatedChild,
@@ -128,7 +130,7 @@ fn optional_reduction(
   output : Array[ReductionCandidate],
 ) -> Unit {
   if node.kind is OptionalNode(true) {
-    let replacement = { ..node, kind: OptionalNode(false), children: [] }
+    let replacement = { ..node, kind: OptionalNode(false), children: [], }
     insert_candidate(output, {
       tree: root.replace(node.node_id, replacement).renumber(),
       kind: RemoveOptionalChild,
@@ -144,14 +146,19 @@ fn integer_reductions(
   node : DerivationTree,
   output : Array[ReductionCandidate],
 ) -> Unit {
-  let current = match node.kind { IntegerLeaf(value) => value; _ => return }
+  let current = match node.kind {
+    IntegerLeaf(value) => value
+    _ => return
+  }
   let (minimum, maximum) = match grammar.rule(node.rule).unwrap().kind {
     Integer(minimum, maximum) => (minimum, maximum)
     _ => return
   }
   let candidates = integer_boundaries(minimum, maximum)
   for value in candidates {
-    if value == current { continue }
+    if value == current {
+      continue
+    }
     let replacement = DerivationTree::leaf(
       node.node_id,
       node.rule,
@@ -176,13 +183,18 @@ fn dictionary_reductions(
   node : DerivationTree,
   output : Array[ReductionCandidate],
 ) -> Unit {
-  let current = match node.kind { DictionaryLeaf(value) => value; _ => return }
+  let current = match node.kind {
+    DictionaryLeaf(value) => value
+    _ => return
+  }
   let values = match grammar.rule(node.rule).unwrap().kind {
     Dictionary(values) => values
     _ => return
   }
   for index, value in values {
-    if index == current || value.length() >= node.payload.length() { continue }
+    if index == current || value.length() >= node.payload.length() {
+      continue
+    }
     let replacement = DerivationTree::leaf(
       node.node_id,
       node.rule,
@@ -282,7 +294,9 @@ pub fn Grammar::reduce_failure(
       seed + Int64::from_int(attempts),
     )
     for candidate in candidates {
-      if attempts >= limit { break }
+      if attempts >= limit {
+        break
+      }
       attempts += 1
       let observation = target.run(candidate.tree.render())
       if observation.failure_fingerprint() == Some(expected) {

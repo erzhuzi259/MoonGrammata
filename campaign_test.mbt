@@ -34,8 +34,9 @@ test "campaign evolves a replayable novelty corpus" {
 ///|
 test "campaign is deterministic for the same configuration" {
   let grammar = mutation_grammar()
-  let target = Target::new("stable", input =>
-    accepted(features=[feature("size", input.length().to_string())]))
+  let target = Target::new("stable", input => {
+    accepted(features=[feature("size", input.length().to_string())])
+  })
   let config : CampaignConfig = {
     ..CampaignConfig::default(seed=99L),
     executions: 80,
@@ -51,12 +52,8 @@ test "campaign is deterministic for the same configuration" {
 test "campaign validates limits before running" {
   let grammar = mutation_grammar()
   let target = Target::new("x", _ => accepted())
-  let config : CampaignConfig = {
-    ..CampaignConfig::default(),
-    executions: 0,
-  }
+  let config : CampaignConfig = { ..CampaignConfig::default(), executions: 0, }
   assert_true(
     run_campaign(grammar, target, config) is Err(InvalidCampaignConfig(_)),
   )
 }
-

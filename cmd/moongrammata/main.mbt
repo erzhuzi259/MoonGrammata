@@ -23,14 +23,7 @@ fn config_grammar() -> @grammata.Grammar {
   let key = builder.dictionary(["host", "port", "mode", "retries"])
   let equals = builder.literal("=")
   let value = builder.dictionary([
-    "localhost",
-    "production",
-    "0",
-    "1",
-    "3",
-    "443",
-    "65535",
-    "65536",
+    "localhost", "production", "0", "1", "3", "443", "65535", "65536",
   ])
   let semicolon = builder.literal(";")
   let assignment = builder.sequence([key, equals, value, semicolon])
@@ -42,7 +35,9 @@ fn config_grammar() -> @grammata.Grammar {
 fn count_byte(input : Bytes, wanted : Int) -> Int {
   let mut count = 0
   for byte in input {
-    if byte.to_int() == wanted { count += 1 }
+    if byte.to_int() == wanted {
+      count += 1
+    }
   }
   count
 }
@@ -91,7 +86,10 @@ fn parse_seed(text : String) -> Result[Int64, String] {
 }
 
 ///|
-fn sample_command(count_text : String, seed_text : String) -> Result[Unit, String] {
+fn sample_command(
+  count_text : String,
+  seed_text : String,
+) -> Result[Unit, String] {
   let count = match parse_positive("COUNT", count_text) {
     Err(error) => return Err(error)
     Ok(value) => value.min(10000)
@@ -126,11 +124,7 @@ fn campaign_command(
     executions,
     initial_inputs: executions.min(16),
   }
-  let result = @grammata.run_campaign(
-    config_grammar(),
-    config_target(),
-    config,
-  ).unwrap()
+  let result = @grammata.run_campaign(config_grammar(), config_target(), config).unwrap()
   println(result.markdown_report(title="Configuration Grammar Campaign"))
   if !result.failures.is_empty() {
     println("Replay artifact:")
@@ -150,7 +144,11 @@ fn replay_command(text : String) -> Result[Unit, String] {
     Ok(value) => value
   }
   println(if outcome.matches() { "MATCH" } else { "DIVERGED" })
-  if outcome.matches() { Ok(()) } else { Err("replay observation diverged") }
+  if outcome.matches() {
+    Ok(())
+  } else {
+    Err("replay observation diverged")
+  }
 }
 
 ///|
@@ -162,7 +160,10 @@ fn dispatch(args : Array[String]) -> Result[Unit, String] {
     "sample" if args.length() == 4 => sample_command(args[2], args[3])
     "campaign" if args.length() == 4 => campaign_command(args[2], args[3])
     "replay" if args.length() == 3 => replay_command(args[2])
-    "help" | "--help" | "-h" => { println(usage()); Ok(()) }
+    "help" | "--help" | "-h" => {
+      println(usage())
+      Ok(())
+    }
     _ => Err(usage())
   }
 }
@@ -177,4 +178,3 @@ fn main {
     }
   }
 }
-

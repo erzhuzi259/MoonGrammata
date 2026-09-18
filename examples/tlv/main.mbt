@@ -13,10 +13,9 @@ fn tlv_grammar() -> @grammata.Grammar {
 fn tlv_target() -> @grammata.Target {
   @grammata.Target::new("tlv-demo", input => {
     if input.length() < 2 {
-      return @grammata.rejected(
-        "truncated-header",
-        features=[@grammata.feature("decoder-stage", "header")],
-      )
+      return @grammata.rejected("truncated-header", features=[
+        @grammata.feature("decoder-stage", "header"),
+      ])
     }
     let tag = input[0].to_int()
     let declared = input[1].to_int()
@@ -30,7 +29,9 @@ fn tlv_target() -> @grammata.Target {
     ]
     if declared != actual {
       @grammata.rejected("length-mismatch", features~)
-    } else if tag == 3 && actual > 0 && input[input.length() - 1].to_int() == 255 {
+    } else if tag == 3 &&
+      actual > 0 &&
+      input[input.length() - 1].to_int() == 255 {
       @grammata.failed("decoder", "reserved-tail-byte", features~)
     } else {
       @grammata.accepted(
@@ -61,4 +62,3 @@ fn main {
     println(result.failures[0].encode_json())
   }
 }
-
