@@ -27,7 +27,9 @@ The Git commit log is authoritative for hashes and timestamps.
 22. Added the one-page contest proposal.
 23. Added a reproducible byte-vs-structure strategy comparison.
 24. Corrected complete-`Int`-range sampling and added extreme-bound tests.
+25. Corrected UTF-8 byte accounting across generation budgets and analysis.
+26. Bounded replay JSON/input decoding and validated embedded replay budgets.
+27. Repeated the Mooncakes non-duplication review and captured release evidence.
 
 No commit exists solely to increase the commit count. Later release, remote CI,
 and publication steps are appended only after their evidence exists.
-

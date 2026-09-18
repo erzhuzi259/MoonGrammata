@@ -2,10 +2,18 @@
 
 Snapshot date: 2026-09-18.
 
-The official Mooncakes registry reported 2,522 modules and 23,035 packages. The
+The official Mooncakes registry reported 2,523 modules and 23,041 packages. The
 review used the complete module metadata endpoint and official full-text search
 for `fuzzer`, `grammar based fuzzing`, `coverage guided fuzzing`, `structured
 fuzzing`, `property based testing`, and related algorithm terms.
+
+The search was repeated immediately before release preparation on 2026-09-18.
+The exact `moongrammata`, `grammar based fuzzing`, and `coverage guided fuzzing`
+queries returned no module. The broad `fuzzer` query returned TELNET-specific
+fuzz helpers, a UI random-testing panel, and pathfinding test infrastructure;
+the `structured fuzzing` results were unrelated UI and Thrift packages. The
+newly visible `mizchi/veri` packages focus on model- and property-based testing.
+None provides the combined boundary below.
 
 No published module with MoonGrammata's combined boundary was found: structured
 text/byte derivation trees, persistent feedback corpus, structural mutation and
@@ -30,4 +38,3 @@ Primary registry/search sources:
 This is a dated evidence statement, not proof that a similar package can never
 appear. The same queries and a manual review of new suspicious results must be
 repeated immediately before `moon publish`.
-

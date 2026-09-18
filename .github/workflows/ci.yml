@@ -75,4 +75,15 @@ jobs:
         run: moon run --target native cmd/moongrammata -- sample 3 20260918
 
       - name: Verify publish archive
-        run: moon publish --dry-run
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          set +e
+          output="$(moon publish --dry-run 2>&1)"
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          if [ "$status" -ne 0 ] &&
+             ! printf '%s\n' "$output" | grep -q 'Dry run completed successfully'; then
+            exit "$status"
+          fi

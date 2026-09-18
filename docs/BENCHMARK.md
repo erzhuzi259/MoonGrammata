@@ -12,7 +12,7 @@ executions per strategy. Recorded 2026-09-18.
 | Strategy | Executions | Features | Signatures | Failures | Corpus |
 | --- | ---: | ---: | ---: | ---: | ---: |
 | single-byte-mutation | 2000 | 4 | 3 | 0 | 0 |
-| structured-feedback | 2000 | 17 | 152 | 1 | 153 |
+| structured-feedback | 2000 | 17 | 147 | 1 | 148 |
 
 The target accepts a framed command document. The byte baseline mutates one byte
 of a valid seed, so most changes damage framing and remain shallow. The
@@ -24,4 +24,3 @@ The executable test recomputes the comparison and asserts only durable facts:
 structured exploration reaches more features and signatures and finds the known
 defect. Wall-clock numbers are deliberately excluded because shared CI runner
 timings are not a stable correctness contract.
-

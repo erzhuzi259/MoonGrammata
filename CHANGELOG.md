@@ -3,7 +3,7 @@
 All notable changes follow Keep a Changelog. The project uses semantic
 versioning after its first published release.
 
-## [Unreleased]
+## [0.1.0] - 2026-09-18
 
 ### Added
 
@@ -17,4 +17,4 @@ versioning after its first published release.
 - Synchronous campaign runner with Markdown and JSON evidence reports.
 - Expression, binary TLV, and state operation sequence examples.
 - Native smoke CLI.
-
+- Cross-platform CI, release evidence, and a reproducible strategy comparison.
