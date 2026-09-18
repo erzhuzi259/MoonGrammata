@@ -68,9 +68,11 @@ jobs:
       - name: Run state-sequence example
         run: moon run --target native examples/state_sequence
 
+      - name: Reproduce strategy comparison
+        run: moon run --target native examples/benchmark
+
       - name: Run CLI smoke command
         run: moon run --target native cmd/moongrammata -- sample 3 20260918
 
       - name: Verify publish archive
         run: moon publish --dry-run
-

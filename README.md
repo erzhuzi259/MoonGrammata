@@ -127,6 +127,7 @@ budget. Replaying compares all stable observations and reports divergence.
 | Expression | Recursive text grammar | Division by zero | `moon run examples/expression` |
 | TLV | Arbitrary binary bytes | Reserved tail in a valid-length frame | `moon run examples/tlv` |
 | State sequence | Stateful operation list | Use after free | `moon run examples/state_sequence` |
+| Benchmark | Framed command language | Strategy comparison | `moon run --target native examples/benchmark` |
 
 Each example has deterministic tests showing that a fixed campaign seed finds
 the known defect and that its replay artifact still matches.
@@ -188,4 +189,3 @@ Apache-2.0. Algorithm ideas and terminology were informed by public fuzzing
 literature and official documentation; no libFuzzer, AFL, or
 libprotobuf-mutator implementation code is copied. See `THIRD_PARTY_NOTICES.md`
 and `docs/PROVENANCE.md`.
-
