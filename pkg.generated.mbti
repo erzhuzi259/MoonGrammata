@@ -518,6 +518,7 @@ pub(all) enum ReplayError {
   MissingField(String)
   InvalidField(String)
   UnsupportedReplayVersion(Int)
+  ArtifactLimitExceeded(Int)
   InputLimitExceeded(Int)
   InvalidHexInput(Int)
   TargetNameMismatch(String, String)
@@ -541,7 +542,7 @@ pub(all) struct ReplayRecord {
   result_digest : String?
   generation_budget : GenerationBudget
 } derive(Eq, @debug.Debug)
-pub fn ReplayRecord::decode_json(String, max_input_bytes? : Int) -> Result[Self, ReplayError]
+pub fn ReplayRecord::decode_json(String, max_input_bytes? : Int, max_artifact_bytes? : Int) -> Result[Self, ReplayError]
 pub fn ReplayRecord::encode_json(Self) -> String
 pub fn ReplayRecord::new(target_name~ : String, seed~ : Int64, input~ : Bytes, observation~ : TargetObservation, generation_budget? : GenerationBudget) -> Self
 

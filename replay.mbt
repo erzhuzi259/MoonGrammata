@@ -39,6 +39,7 @@ pub(all) enum ReplayError {
   MissingField(String)
   InvalidField(String)
   UnsupportedReplayVersion(Int)
+  ArtifactLimitExceeded(Int)
   InputLimitExceeded(Int)
   InvalidHexInput(Int)
   TargetNameMismatch(String, String)
@@ -231,7 +232,11 @@ fn parse_seed(value : String) -> Result[Int64, ReplayError] {
 pub fn ReplayRecord::decode_json(
   text : String,
   max_input_bytes? : Int = 1024 * 1024,
+  max_artifact_bytes? : Int = 4 * 1024 * 1024,
 ) -> Result[ReplayRecord, ReplayError] {
+  if @utf8.encode(text).length() > max_artifact_bytes.max(0) {
+    return Err(ArtifactLimitExceeded(max_artifact_bytes.max(0)))
+  }
   let parsed = @json.parse(text) catch { _ => return Err(InvalidJson) }
   let fields = match replay_object(parsed, "replay root") {
     Err(error) => return Err(error)
@@ -301,6 +306,11 @@ pub fn ReplayRecord::decode_json(
     Err(error) => return Err(error)
     Ok(value) => value
   }
+  let generation_budget = { max_depth, max_nodes, max_bytes, max_repeat, }
+  match generation_budget.validate() {
+    Err(_) => return Err(InvalidField("generation_budget is invalid"))
+    Ok(_) => ()
+  }
   Ok({
     schema_version: version,
     target_name,
@@ -309,7 +319,7 @@ pub fn ReplayRecord::decode_json(
     feedback_signature: feedback,
     failure_fingerprint: failure,
     result_digest,
-    generation_budget: { max_depth, max_nodes, max_bytes, max_repeat, },
+    generation_budget,
   })
 }
 

@@ -45,6 +45,28 @@ test "replay rejects malformed and oversized artifacts" {
     ReplayRecord::decode_json(record.encode_json(), max_input_bytes=3)
     is Err(InputLimitExceeded(3)),
   )
+  assert_true(
+    ReplayRecord::decode_json(record.encode_json(), max_artifact_bytes=8)
+    is Err(ArtifactLimitExceeded(8)),
+  )
+}
+
+///|
+test "replay rejects invalid embedded generation budgets" {
+  let observation = accepted()
+  let record = ReplayRecord::new(
+    target_name="x",
+    seed=1L,
+    input=b"x",
+    observation~,
+  )
+  let invalid = record
+    .encode_json()
+    .replace(old="\"max_depth\":32", new="\"max_depth\":0")
+  assert_true(
+    ReplayRecord::decode_json(invalid)
+    is Err(InvalidField("generation_budget is invalid")),
+  )
 }
 
 ///|
