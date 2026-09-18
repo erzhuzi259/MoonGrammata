@@ -293,3 +293,35 @@ pub fn Grammar::generate(
   }
   generate_rule(self, state, self.start(), 1)
 }
+
+///|
+/// Generate a standalone subtree for an existing grammar rule. This is the
+/// primitive used by structure-preserving mutation and crossover repair.
+pub fn Grammar::generate_from(
+  self : Grammar,
+  rule : RuleId,
+  seed~ : Int64,
+  budget? : GenerationBudget = GenerationBudget::default(),
+) -> Result[DerivationTree, GenerationError] {
+  match self.rule(rule) {
+    None => return Err(NoViableAlternative(rule.value()))
+    Some(_) => ()
+  }
+  match budget.validate() {
+    Err(error) => return Err(error)
+    Ok(_) => ()
+  }
+  let analysis = match self.validate_productivity() {
+    Err(error) => return Err(UnproductiveGrammar(error))
+    Ok(value) => value
+  }
+  let state = {
+    random: Random::new(seed),
+    budget,
+    analysis,
+    nodes: 0,
+    bytes: 0,
+    next_node_id: 0,
+  }
+  generate_rule(self, state, rule, 1)
+}
