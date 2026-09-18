@@ -30,6 +30,9 @@ The Git commit log is authoritative for hashes and timestamps.
 25. Corrected UTF-8 byte accounting across generation budgets and analysis.
 26. Bounded replay JSON/input decoding and validated embedded replay budgets.
 27. Repeated the Mooncakes non-duplication review and captured release evidence.
+28. Published the complete history to a public GitHub repository.
+29. Replaced a credential-dependent CI dry run with portable package validation.
+30. Passed three-platform CI, published 0.1.0, and verified a clean consumer.
 
-No commit exists solely to increase the commit count. Later release, remote CI,
-and publication steps are appended only after their evidence exists.
+No commit exists solely to increase the commit count. Release, remote CI, and
+publication steps were appended only after their evidence existed.

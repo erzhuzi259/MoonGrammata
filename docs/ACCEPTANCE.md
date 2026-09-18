@@ -25,7 +25,7 @@ are documented as complementary near-neighbours rather than claimed absent.
 - Production MoonBit: 20 files, 5,112 physical lines, 4,460 nonblank lines that
   do not begin with `//`. Test files are excluded from this production count.
 - Tests: 19 MoonBit test files, 982 physical lines, 869 nonblank/non-`//` lines.
-- History at release preparation: 27 meaningful commits, all authored and
+- History before the final evidence update: 29 meaningful commits, all authored and
   committed by `erzhuzi259 <erzhuzi259@users.noreply.github.com>`.
 - No `_build`, `target`, `.mooncakes`, or `.scratch` artifact is tracked.
 
@@ -86,12 +86,24 @@ kept as a separate local release gate.
 
 ## External gates
 
-The following evidence is intentionally not claimed before it exists:
+All external release gates passed on 2026-09-18:
 
-- public GitHub repository reachable at the declared URL;
-- the current commit passing the three-platform GitHub Actions workflow;
-- `erzhuzi259/moongrammata@0.1.0` published on Mooncakes;
-- a clean consumer project resolving and checking the published dependency.
+- The [GitHub repository](https://github.com/erzhuzi259/MoonGrammata) is public,
+  uses `main` as its default branch, and GitHub recognizes its Apache-2.0 license.
+- [GitHub Actions run 35326353732](https://github.com/erzhuzi259/MoonGrammata/actions/runs/35326353732)
+  passed on Ubuntu, macOS, and Windows for commit `a72b589`. Each job performed
+  dependency resolution, all-target check/build/test, formatting and public API
+  checks, all examples, the strategy benchmark, the CLI smoke test, and package
+  manifest generation.
+- `moon publish` returned `200 OK` for `erzhuzi259/moongrammata@0.1.0`.
+  The [Mooncakes package](https://mooncakes.io/docs/erzhuzi259/moongrammata) API
+  reports version `0.1.0`, `build_status: success`, Apache-2.0, and checksum
+  `623833c165307584f49a3c164570799ee0a5db46fd6d5f000f69f38ffbe57b35`.
+- A new, unrelated temporary MoonBit module installed the exact published
+  version with `moon add erzhuzi259/moongrammata@0.1.0`, imported the root
+  package, built a literal grammar through the public `GrammarBuilder` API, and
+  generated/rendered `hello`. Its consumer test passed on Wasm, Wasm-GC,
+  JavaScript, and Native.
 
-Release acceptance is incomplete until these four items are replaced by links
-and verified results after publication.
+The repository, CI, package registry, and clean-consumer evidence jointly prove
+that release `0.1.0` is public, installable, buildable, testable, and runnable.

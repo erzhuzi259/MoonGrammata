@@ -32,11 +32,13 @@ MoonGrammata keeps the input structure and the exploration history together:
 
 ## Installation
 
-After the first release is published:
+Install the current release from Mooncakes:
 
 ```bash
 moon add erzhuzi259/moongrammata@0.1.0
 ```
+
+Package page: <https://mooncakes.io/docs/erzhuzi259/moongrammata>
 
 During local development, clone the repository and run:
 
@@ -176,8 +178,12 @@ moon fmt
 git diff --exit-code
 moon info
 git diff --exit-code
-moon publish --dry-run
+moon package --list
 ```
+
+Maintainers additionally run the authenticated `moon publish --dry-run` before
+release; clean public CI runners use `moon package --list` because the registry
+dry run requires private Mooncakes credentials.
 
 See `docs/ACCEPTANCE.md` for captured local evidence and
 `docs/MOONCAKES_RESEARCH.md` for the dated non-duplication review.
