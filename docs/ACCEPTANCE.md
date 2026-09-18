@@ -77,9 +77,12 @@ The network-enabled `moon publish --dry-run` constructed
 `erzhuzi259-moongrammata-0.1.0.zip`, extracted it, and successfully ran
 `moon check` against the extracted package. Mooncakes returned `202 Accepted`
 and stated that the dry run completed successfully without making changes. The
-current CLI nevertheless returned exit code 1 after that accepted response; CI
-therefore accepts the nonzero status only when the response contains the exact
-server success message. Any other nonzero dry-run result remains a failure.
+current CLI nevertheless returned exit code 1 after that accepted response.
+Public CI cannot use this command because a clean runner has no private
+Mooncakes credential. It instead runs `moon package --list`, which performs
+`moon check`, generates the same publish ZIP, and prints its complete manifest
+without requiring registry authentication. The authenticated server dry run is
+kept as a separate local release gate.
 
 ## External gates
 
