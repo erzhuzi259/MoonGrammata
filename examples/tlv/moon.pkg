@@ -1,0 +1,6 @@
+import {
+  "erzhuzi259/moongrammata" @grammata,
+}
+
+pkgtype(kind: "executable")
+
