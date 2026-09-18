@@ -85,3 +85,21 @@ test "tree replacement and rule lookup preserve structure" {
   assert_eq(tree.renumber().node_id(), 0)
   assert_true(tree.structural_summary().has_prefix("nodes="))
 }
+
+///|
+test "generation applies byte budgets to UTF-8 output" {
+  let builder = GrammarBuilder::new()
+  let literal = builder.literal("月")
+  let grammar = builder.set_start(literal).build().unwrap()
+  assert_true(
+    grammar.generate(seed=1L, budget=GenerationBudget::new(max_bytes=2))
+    is Err(ByteBudgetExceeded(2)),
+  )
+  assert_eq(
+    grammar
+    .generate(seed=1L, budget=GenerationBudget::new(max_bytes=3))
+    .unwrap()
+    .byte_length(),
+    3,
+  )
+}

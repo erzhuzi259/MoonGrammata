@@ -192,7 +192,7 @@ fn dictionary_reductions(
     _ => return
   }
   for index, value in values {
-    if index == current || value.length() >= node.payload.length() {
+    if index == current || @utf8.encode(value).length() >= node.payload.length() {
       continue
     }
     let replacement = DerivationTree::leaf(

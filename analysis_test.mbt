@@ -55,3 +55,16 @@ test "integer width analysis accounts for zero and signs" {
   assert_eq(analysis.properties(positive).unwrap().minimum_bytes, Some(3))
   assert_eq(analysis.properties(negative).unwrap().minimum_bytes, Some(3))
 }
+
+///|
+test "minimum byte analysis measures UTF-8 rather than characters" {
+  let builder = GrammarBuilder::new()
+  let literal = builder.literal("月亮")
+  let dictionary = builder.dictionary(["a", "月"])
+  let start = builder.sequence([literal, dictionary])
+  let grammar = builder.set_start(start).build().unwrap()
+  let analysis = grammar.analyze()
+  assert_eq(analysis.properties(literal).unwrap().minimum_bytes, Some(6))
+  assert_eq(analysis.properties(dictionary).unwrap().minimum_bytes, Some(1))
+  assert_eq(analysis.properties(start).unwrap().minimum_bytes, Some(7))
+}

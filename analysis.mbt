@@ -149,7 +149,7 @@ fn productive_kind(
 
 ///|
 fn minimum_string_bytes(value : String) -> Int {
-  value.length()
+  @utf8.encode(value).length()
 }
 
 ///|
@@ -224,7 +224,7 @@ fn minimum_bytes_kind(
     Dictionary(values) => {
       let mut result : Int? = None
       for value in values {
-        result = min_optional(result, Some(value.length()))
+        result = min_optional(result, Some(@utf8.encode(value).length()))
       }
       result
     }
