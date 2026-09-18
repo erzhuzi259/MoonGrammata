@@ -25,6 +25,25 @@ test "bounded and weighted choices respect their contracts" {
 }
 
 ///|
+test "bounded sampling supports the complete Int domain without overflow" {
+  let random = Random::new(991L)
+  let mut saw_negative = false
+  let mut saw_positive = false
+  for index = 0; index < 1000; index = index + 1 {
+    let value = random.between(-2147483648, 2147483647)
+    if value < 0 {
+      saw_negative = true
+    }
+    if value > 0 {
+      saw_positive = true
+    }
+  }
+  assert_true(saw_negative)
+  assert_true(saw_positive)
+  assert_eq(random.between(7, 7), 7)
+}
+
+///|
 test "snapshots resume the exact stream" {
   let random = Random::new(20260918L)
   random.advance(19)

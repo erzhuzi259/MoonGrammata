@@ -56,7 +56,11 @@ pub fn Random::between(self : Random, minimum : Int, maximum : Int) -> Int {
   if maximum <= minimum {
     minimum
   } else {
-    minimum + self.below(maximum - minimum + 1)
+    let span = Int64::from_int(maximum) - Int64::from_int(minimum) + 1L
+    let high = Int64::from_int(self.next_raw())
+    let low = Int64::from_int(self.next_raw())
+    let combined = high * 2147483647L + low
+    (Int64::from_int(minimum) + combined % span).to_int()
   }
 }
 
