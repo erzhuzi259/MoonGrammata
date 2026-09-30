@@ -130,6 +130,7 @@ fn push_event(
 fn record_failure(
   failures : Array[ReplayRecord],
   seen : @hashmap.HashMap[FailureFingerprint, Unit],
+  maximum : Int,
   target : Target,
   input : Bytes,
   observation : TargetObservation,
@@ -139,7 +140,7 @@ fn record_failure(
   match observation.failure_fingerprint() {
     None => None
     Some(fingerprint) =>
-      if !seen.contains(fingerprint) {
+      if !seen.contains(fingerprint) && failures.length() < maximum {
         seen.set(fingerprint, ())
         failures.push(
           ReplayRecord::new(
@@ -175,7 +176,14 @@ fn execute_candidate(
   let observation = target.run(input)
   counters.completed += 1
   let new_failure = record_failure(
-    failures, seen_failures, target, input, observation, seed, budget,
+    failures,
+    seen_failures,
+    corpus.limits.max_failures,
+    target,
+    input,
+    observation,
+    seed,
+    budget,
   )
   match new_failure {
     None => ()

@@ -57,3 +57,24 @@ test "campaign validates limits before running" {
     run_campaign(grammar, target, config) is Err(InvalidCampaignConfig(_)),
   )
 }
+
+///|
+test "campaign bounds independent replay records by failure budget" {
+  let grammar = mutation_grammar()
+  let mut invocation = 0
+  let target = Target::new("many-failures", _ => {
+    invocation += 1
+    failed("distinct", invocation.to_string())
+  })
+  let config : CampaignConfig = {
+    ..CampaignConfig::default(seed=123L),
+    executions: 20,
+    initial_inputs: 8,
+    corpus_limits: { ..CorpusLimits::default(), max_failures: 1, },
+  }
+  let result = run_campaign(grammar, target, config).unwrap()
+  assert_eq(result.statistics.completed_executions, 20)
+  assert_eq(invocation, 20)
+  assert_eq(result.failures.length(), 1)
+  assert_eq(result.statistics.unique_failures, 1)
+}
