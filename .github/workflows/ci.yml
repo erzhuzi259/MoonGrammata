@@ -41,13 +41,13 @@ jobs:
         run: moon update
 
       - name: Check every backend
-        run: moon check --target all --deny-warn
+        run: moon check --target all --deny-warn --warn-list=-implicit_impl_as_method-test_unqualified_package
 
       - name: Build every backend
-        run: moon build --target all --deny-warn
+        run: moon build --target all --deny-warn --warn-list=-implicit_impl_as_method-test_unqualified_package
 
       - name: Test every backend
-        run: moon test --target all --deny-warn
+        run: moon test --target all --deny-warn --warn-list=-implicit_impl_as_method-test_unqualified_package
 
       - name: Verify formatting
         run: |

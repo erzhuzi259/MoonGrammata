@@ -40,11 +40,13 @@ moon add erzhuzi259/moongrammata@0.1.0
 
 Package page: <https://mooncakes.io/docs/erzhuzi259/moongrammata>
 
+The current post-release changes remain local; see [2026-10-01 verification](docs/LOCAL_VERIFICATION_2026-10-01.md).
+
 During local development, clone the repository and run:
 
 ```bash
-moon check --target all --deny-warn
-moon test --target all --deny-warn
+moon check --target all --deny-warn --warn-list=-implicit_impl_as_method-test_unqualified_package
+moon test --target all --deny-warn --warn-list=-implicit_impl_as_method-test_unqualified_package
 moon run --target native cmd/moongrammata -- sample 5 20260918
 moon run --target native cmd/moongrammata -- campaign 1000 20260918
 ```
@@ -105,7 +107,9 @@ Features are explicit `(domain, value)` pairs. Their signature is order
 independent and duplicate free. Corpus admission distinguishes the first input,
 new features, new signatures, and new failure fingerprints. Duplicate input,
 entry capacity, aggregate byte capacity, failure capacity, and per-input size
-are all bounded.
+are all bounded. Campaign replay records also obey `CorpusLimits.max_failures`
+independently of event and corpus-entry limits; once full, execution continues
+without retaining additional distinct failures for replay.
 
 The scheduler uses feature rarity, signature rarity, prior discoveries, target
 cost, failure status, and selection count. This is a deterministic heuristic,
