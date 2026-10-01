@@ -3,7 +3,7 @@
 All notable changes follow Keep a Changelog. The project uses semantic
 versioning after its first published release.
 
-## [Unreleased] - local only, 2026-10-01
+## [0.1.1] - 2026-10-01
 
 - Bound independent replay records by the configured failure budget, with regression coverage.
 - Verify with moonc 0.10.14 and keep CI strict for all but two known migration warnings.

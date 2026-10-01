@@ -35,12 +35,12 @@ MoonGrammata keeps the input structure and the exploration history together:
 Install the current release from Mooncakes:
 
 ```bash
-moon add erzhuzi259/moongrammata@0.1.0
+moon add erzhuzi259/moongrammata@0.1.1
 ```
 
 Package page: <https://mooncakes.io/docs/erzhuzi259/moongrammata>
 
-The current post-release changes remain local; see [2026-10-01 verification](docs/LOCAL_VERIFICATION_2026-10-01.md).
+For the latest verification details, see [2026-10-01 verification](docs/LOCAL_VERIFICATION_2026-10-01.md).
 
 During local development, clone the repository and run:
 
