@@ -107,3 +107,11 @@ All external release gates passed on 2026-09-18:
 
 The repository, CI, package registry, and clean-consumer evidence jointly prove
 that release `0.1.0` is public, installable, buildable, testable, and runnable.
+
+## 0.1.1 update — 2026-10-01
+
+Release `0.1.1` bounds independent replay records by the configured failure
+budget without stopping campaign execution. Its three-platform CI, Mooncakes
+publication, and independent consumer verification are recorded in
+[the 2026-10-01 release verification](LOCAL_VERIFICATION_2026-10-01.md).
+The `0.1.0` evidence above remains the historical record for that release.
