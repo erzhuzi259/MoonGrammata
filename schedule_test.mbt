@@ -36,8 +36,8 @@ test "scheduler selections are deterministic for a seed" {
   let right_corpus = populated()
   let left = EnergyScheduler::new(99L)
   let right = EnergyScheduler::new(99L)
-  let ids_left : Array[Int] = []
-  let ids_right : Array[Int] = []
+  let ids_left : Array[Int32] = []
+  let ids_right : Array[Int32] = []
   for index = 0; index < 50; index = index + 1 {
     ids_left.push(left.select(left_corpus).unwrap().entry_id)
     ids_right.push(right.select(right_corpus).unwrap().entry_id)

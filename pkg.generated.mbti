@@ -7,19 +7,19 @@ import {
 }
 
 // Values
-pub fn accepted(features? : Array[Feature], result_digest? : String, cost_class? : Int) -> TargetObservation
+pub fn accepted(features? : Array[Feature], result_digest? : String, cost_class? : Int32) -> TargetObservation
 
-pub fn agreement_target(String, Array[Target], minimum_agreement? : Int) -> Target
+pub fn agreement_target(String, Array[Target], minimum_agreement? : Int32) -> Target
 
-pub fn alternative(RuleId, weight? : Int, label? : String) -> Alternative
+pub fn alternative(RuleId, weight? : Int32, label? : String) -> Alternative
 
 pub fn compare_strategies(Array[StrategyEvidence]) -> String
 
 pub fn crossover(DerivationTree, DerivationTree, seed~ : Int64, config? : CrossoverConfig) -> Result[CrossoverResult, CrossoverError]
 
-pub fn crossover_compatible_rule_count(DerivationTree, DerivationTree) -> Int
+pub fn crossover_compatible_rule_count(DerivationTree, DerivationTree) -> Int32
 
-pub fn deterministic_permutation(Int64, Int) -> Array[Int]
+pub fn deterministic_permutation(Int64, Int32) -> Array[Int32]
 
 pub fn differential_target(String, Target, Target, policy? : DifferentialPolicy) -> Target
 
@@ -31,11 +31,11 @@ pub fn feedback_signature(Array[Feature]) -> FeedbackSignature
 
 pub fn metamorphic_target(String, Target, Array[MetamorphicTransform]) -> Target
 
-pub fn observation(ExecutionDisposition, features? : Array[Feature], result_digest? : String, cost_class? : Int) -> TargetObservation
+pub fn observation(ExecutionDisposition, features? : Array[Feature], result_digest? : String, cost_class? : Int32) -> TargetObservation
 
 pub fn rejected(String, features? : Array[Feature]) -> TargetObservation
 
-pub let replay_schema_version : Int
+pub let replay_schema_version : Int32
 
 pub fn run_campaign(Grammar, Target, CampaignConfig) -> Result[CampaignResult, CampaignError]
 
@@ -46,57 +46,65 @@ pub fn same_disposition_transform(String, (Bytes) -> Bytes) -> MetamorphicTransf
 // Errors
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum AdmissionDecision {
-  Admitted(Int, AdmissionReason)
+  Admitted(Int32, AdmissionReason)
   Rejected(RejectionReason)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum AdmissionReason {
   FirstInput
-  NovelFeature(Int)
+  NovelFeature(Int32)
   NovelSignature
   NewFailure(FailureFingerprint)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Alternative {
   rule : RuleId
-  weight : Int
+  weight : Int32
   label : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum AnalysisError {
-  UnproductiveStartRule(Int)
-  UnproductiveRule(Int)
-  NoTerminatingAlternative(Int)
-  MinimumCostOverflow(Int)
-} derive(Eq, @debug.Debug)
+  UnproductiveStartRule(Int32)
+  UnproductiveRule(Int32)
+  NoTerminatingAlternative(Int32)
+  MinimumCostOverflow(Int32)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CampaignConfig {
   seed : Int64
-  executions : Int
-  initial_inputs : Int
-  crossover_percent : Int
+  executions : Int32
+  initial_inputs : Int32
+  crossover_percent : Int32
   generation_budget : GenerationBudget
   mutation_config : MutationConfig
   crossover_config : CrossoverConfig
   corpus_limits : CorpusLimits
-  max_events : Int
-} derive(Eq, @debug.Debug)
+  max_events : Int32
+}
 pub fn CampaignConfig::default(seed? : Int64) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CampaignError {
   InvalidCampaignConfig(String)
   InitialGenerationFailed(GenerationError)
   CorpusCouldNotBeSeeded
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CampaignEvent {
-  execution : Int
-  input_bytes : Int
-  corpus_entries : Int
+  execution : Int32
+  input_bytes : Int32
+  corpus_entries : Int32
   kind : CampaignEventKind
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CampaignEventKind {
   Generated
   Mutated(MutationStrategy)
@@ -105,235 +113,254 @@ pub(all) enum CampaignEventKind {
   RejectedInput(RejectionReason)
   FailureFound(FailureFingerprint)
   MutationSkipped
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CampaignResult {
   statistics : CampaignStatistics
   corpus : Array[CorpusEntry]
   failures : Array[ReplayRecord]
   events : Array[CampaignEvent]
-} derive(Eq, @debug.Debug)
+}
 pub fn CampaignResult::json_report(Self) -> String
 pub fn CampaignResult::markdown_report(Self, title? : String) -> String
 pub fn CampaignResult::strategy_evidence(Self, String) -> StrategyEvidence
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CampaignStatistics {
-  requested_executions : Int
-  completed_executions : Int
-  generated_inputs : Int
-  mutated_inputs : Int
-  crossed_inputs : Int
-  admitted_inputs : Int
-  rejected_inputs : Int
-  unique_failures : Int
-  mutation_failures : Int
+  requested_executions : Int32
+  completed_executions : Int32
+  generated_inputs : Int32
+  mutated_inputs : Int32
+  crossed_inputs : Int32
+  admitted_inputs : Int32
+  rejected_inputs : Int32
+  unique_failures : Int32
+  mutation_failures : Int32
   final_corpus : CorpusStatistics
-} derive(Eq, @debug.Debug)
+}
 
 pub struct Corpus {
   entries : Array[CorpusEntry]
   limits : CorpusLimits
   registry : FeatureRegistry
-  input_ids : @hashmap.HashMap[String, Int]
-  failure_ids : @hashmap.HashMap[FailureFingerprint, Int]
-  mut total_bytes : Int
-  mut failure_count : Int
+  input_ids : @hashmap.HashMap[String, Int32]
+  failure_ids : @hashmap.HashMap[FailureFingerprint, Int32]
+  mut total_bytes : Int32
+  mut failure_count : Int32
 }
 pub fn Corpus::consider(Self, DerivationTree, TargetObservation, CorpusOrigin) -> AdmissionDecision
 pub fn Corpus::entries(Self) -> Array[CorpusEntry]
-pub fn Corpus::entry(Self, Int) -> CorpusEntry?
+pub fn Corpus::entry(Self, Int32) -> CorpusEntry?
 pub fn Corpus::failure_entry(Self, FailureFingerprint) -> CorpusEntry?
-pub fn Corpus::feature_frequency(Self, Feature) -> Int
+pub fn Corpus::feature_frequency(Self, Feature) -> Int32
 pub fn Corpus::find_input(Self, Bytes) -> CorpusEntry?
 pub fn Corpus::is_empty(Self) -> Bool
-pub fn Corpus::length(Self) -> Int
+pub fn Corpus::length(Self) -> Int32
 pub fn Corpus::new(limits? : CorpusLimits) -> Self
-pub fn Corpus::signature_frequency(Self, FeedbackSignature) -> Int
+pub fn Corpus::signature_frequency(Self, FeedbackSignature) -> Int32
 pub fn Corpus::smallest_failure(Self, FailureFingerprint) -> CorpusEntry?
 pub fn Corpus::statistics(Self) -> CorpusStatistics
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CorpusEntry {
-  id : Int
+  id : Int32
   tree : DerivationTree
   observation : TargetObservation
   signature : FeedbackSignature
   failure : FailureFingerprint?
   origin : CorpusOrigin
   input_key : String
-  mut executions : Int
-  mut selections : Int
-  mut discoveries : Int
-  mut energy : Int
-} derive(Eq, @debug.Debug)
+  mut executions : Int32
+  mut selections : Int32
+  mut discoveries : Int32
+  mut energy : Int32
+}
 pub fn CorpusEntry::is_failure(Self) -> Bool
 pub fn CorpusEntry::observation(Self) -> TargetObservation
 pub fn CorpusEntry::record_discovery(Self) -> Unit
 pub fn CorpusEntry::record_execution(Self) -> Unit
 pub fn CorpusEntry::record_selection(Self) -> Unit
-pub fn CorpusEntry::set_energy(Self, Int) -> Unit
+pub fn CorpusEntry::set_energy(Self, Int32) -> Unit
 pub fn CorpusEntry::tree(Self) -> DerivationTree
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CorpusLimits {
-  max_entries : Int
-  max_total_bytes : Int
-  max_failures : Int
-  max_input_bytes : Int
-} derive(Eq, @debug.Debug)
+  max_entries : Int32
+  max_total_bytes : Int32
+  max_failures : Int32
+  max_input_bytes : Int32
+}
 pub fn CorpusLimits::default() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CorpusOrigin {
   Seeded(Int64)
   Generated(Int64)
-  Mutated(Int, String)
-  Crossed(Int, Int)
-  Reduced(Int)
+  Mutated(Int32, String)
+  Crossed(Int32, Int32)
+  Reduced(Int32)
   Replayed
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CorpusStatistics {
-  entries : Int
-  failures : Int
-  total_bytes : Int
-  unique_inputs : Int
-  unique_features : Int
-  unique_signatures : Int
-  unique_failures : Int
-} derive(Eq, @debug.Debug)
+  entries : Int32
+  failures : Int32
+  total_bytes : Int32
+  unique_inputs : Int32
+  unique_features : Int32
+  unique_signatures : Int32
+  unique_failures : Int32
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CrossoverConfig {
-  maximum_output_bytes : Int
-  maximum_nodes : Int
-  maximum_depth : Int
-  attempts : Int
-} derive(Eq, @debug.Debug)
+  maximum_output_bytes : Int32
+  maximum_nodes : Int32
+  maximum_depth : Int32
+  attempts : Int32
+}
 pub fn CrossoverConfig::default() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum CrossoverError {
   NoCompatibleSubtree
-  CrossoverBudgetExceeded(String, Int)
+  CrossoverBudgetExceeded(String, Int32)
   NoEffectiveCrossover
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct CrossoverResult {
   tree : DerivationTree
-  recipient_node : Int
-  donor_node : Int
+  recipient_node : Int32
+  donor_node : Int32
   rule : RuleId
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DerivationKind {
   LiteralLeaf
   ByteLeaf
-  IntegerLeaf(Int)
-  DictionaryLeaf(Int)
+  IntegerLeaf(Int32)
+  DictionaryLeaf(Int32)
   SequenceNode
-  ChoiceNode(Int, String)
-  RepeatNode(Int)
+  ChoiceNode(Int32, String)
+  RepeatNode(Int32)
   OptionalNode(Bool)
   ReferenceNode(String)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct DerivationTree {
-  node_id : Int
+  node_id : Int32
   rule : RuleId
   kind : DerivationKind
   payload : Array[Byte]
   children : Array[DerivationTree]
-} derive(Eq, @debug.Debug)
-pub fn DerivationTree::branch(Int, RuleId, DerivationKind, Array[Self]) -> Self
-pub fn DerivationTree::byte_length(Self) -> Int
+}
+pub fn DerivationTree::branch(Int32, RuleId, DerivationKind, Array[Self]) -> Self
+pub fn DerivationTree::byte_length(Self) -> Int32
 pub fn DerivationTree::children(Self) -> Array[Self]
-pub fn DerivationTree::depth(Self) -> Int
+pub fn DerivationTree::depth(Self) -> Int32
 pub fn DerivationTree::descendants(Self) -> Array[Self]
-pub fn DerivationTree::find(Self, Int) -> Self?
+pub fn DerivationTree::find(Self, Int32) -> Self?
 pub fn DerivationTree::kind(Self) -> DerivationKind
-pub fn DerivationTree::leaf(Int, RuleId, DerivationKind, Array[Byte]) -> Self
-pub fn DerivationTree::node_count(Self) -> Int
-pub fn DerivationTree::node_id(Self) -> Int
+pub fn DerivationTree::leaf(Int32, RuleId, DerivationKind, Array[Byte]) -> Self
+pub fn DerivationTree::node_count(Self) -> Int32
+pub fn DerivationTree::node_id(Self) -> Int32
 pub fn DerivationTree::nodes_for_rule(Self, RuleId) -> Array[Self]
 pub fn DerivationTree::payload(Self) -> Array[Byte]
 pub fn DerivationTree::render(Self) -> Bytes
 pub fn DerivationTree::render_text(Self) -> Result[String, String]
 pub fn DerivationTree::renumber(Self) -> Self
-pub fn DerivationTree::replace(Self, Int, Self) -> Self
+pub fn DerivationTree::replace(Self, Int32, Self) -> Self
 pub fn DerivationTree::rule(Self) -> RuleId
 pub fn DerivationTree::structural_summary(Self) -> String
-pub fn DerivationTree::without_child(Self, Int) -> Self?
+pub fn DerivationTree::without_child(Self, Int32) -> Self?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum DifferentialPolicy {
   CompareDisposition
   CompareResultDigest
   CompareDispositionAndDigest
-} derive(Eq, @debug.Debug)
+}
 
 pub struct EnergyScheduler {
   config : ScheduleConfig
   random : Random
-  mut rounds : Int
+  mut rounds : Int32
 }
-pub fn EnergyScheduler::energy_for(Self, Corpus, CorpusEntry) -> Int
+pub fn EnergyScheduler::energy_for(Self, Corpus, CorpusEntry) -> Int32
 pub fn EnergyScheduler::new(Int64, config? : ScheduleConfig) -> Self
 pub fn EnergyScheduler::rank(Self, Corpus) -> Array[ScheduleDecision]
-pub fn EnergyScheduler::refresh(Self, Corpus) -> Array[Int]
-pub fn EnergyScheduler::rounds(Self) -> Int
+pub fn EnergyScheduler::refresh(Self, Corpus) -> Array[Int32]
+pub fn EnergyScheduler::rounds(Self) -> Int32
 pub fn EnergyScheduler::seed(Self) -> Int64
 pub fn EnergyScheduler::select(Self, Corpus) -> ScheduleDecision?
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ExecutionDisposition {
   Accepted
   Rejected(String)
   Failed(String, String)
-} derive(Eq, @debug.Debug)
+}
 
-pub(all) struct FailureFingerprint(String) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct FailureFingerprint(String)
 pub fn FailureFingerprint::value(Self) -> String
 
+#derive(Eq, Hash, @debug.Debug)
 pub(all) struct Feature {
   domain : String
   value : String
-} derive(Eq, Hash, @debug.Debug)
+}
 pub fn Feature::canonical(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) struct FeatureDelta {
   signature : FeedbackSignature
   novel_features : Array[Feature]
   all_features : Array[Feature]
-} derive(Eq, @debug.Debug)
+}
 
 pub struct FeatureRegistry {
-  seen : @hashmap.HashMap[Feature, Int]
-  signatures : @hashmap.HashMap[FeedbackSignature, Int]
-  mut observations : Int
+  seen : @hashmap.HashMap[Feature, Int32]
+  signatures : @hashmap.HashMap[FeedbackSignature, Int32]
+  mut observations : Int32
 }
-pub fn FeatureRegistry::feature_frequency(Self, Feature) -> Int
+pub fn FeatureRegistry::feature_frequency(Self, Feature) -> Int32
 pub fn FeatureRegistry::new() -> Self
-pub fn FeatureRegistry::observation_count(Self) -> Int
+pub fn FeatureRegistry::observation_count(Self) -> Int32
 pub fn FeatureRegistry::observe(Self, TargetObservation) -> FeatureDelta
-pub fn FeatureRegistry::signature_frequency(Self, FeedbackSignature) -> Int
-pub fn FeatureRegistry::unique_feature_count(Self) -> Int
-pub fn FeatureRegistry::unique_signature_count(Self) -> Int
+pub fn FeatureRegistry::signature_frequency(Self, FeedbackSignature) -> Int32
+pub fn FeatureRegistry::unique_feature_count(Self) -> Int32
+pub fn FeatureRegistry::unique_signature_count(Self) -> Int32
 
-pub(all) struct FeedbackSignature(String) derive(Eq, Hash, @debug.Debug)
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct FeedbackSignature(String)
 pub fn FeedbackSignature::value(Self) -> String
 
+#derive(Eq, @debug.Debug)
 pub(all) struct GenerationBudget {
-  max_depth : Int
-  max_nodes : Int
-  max_bytes : Int
-  max_repeat : Int
-} derive(Eq, @debug.Debug)
+  max_depth : Int32
+  max_nodes : Int32
+  max_bytes : Int32
+  max_repeat : Int32
+}
 pub fn GenerationBudget::default() -> Self
-pub fn GenerationBudget::new(max_depth? : Int, max_nodes? : Int, max_bytes? : Int, max_repeat? : Int) -> Self
+pub fn GenerationBudget::new(max_depth? : Int32, max_nodes? : Int32, max_bytes? : Int32, max_repeat? : Int32) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum GenerationError {
   InvalidBudget(String)
   UnproductiveGrammar(AnalysisError)
-  DepthBudgetExceeded(Int)
-  NodeBudgetExceeded(Int)
-  ByteBudgetExceeded(Int)
-  NoViableAlternative(Int)
-  InvalidGeneratedInteger(Int, Int)
-} derive(Eq, @debug.Debug)
+  DepthBudgetExceeded(Int32)
+  NodeBudgetExceeded(Int32)
+  ByteBudgetExceeded(Int32)
+  NoViableAlternative(Int32)
+  InvalidGeneratedInteger(Int32, Int32)
+}
 
 pub struct Grammar {
   rules : Array[RuleDefinition]
@@ -349,19 +376,20 @@ pub fn Grammar::name_of(Self, RuleId) -> String?
 pub fn Grammar::reduce_failure(Self, DerivationTree, Target, fingerprint? : FailureFingerprint, seed? : Int64, config? : ReductionConfig) -> Result[ReductionResult, ReductionError]
 pub fn Grammar::resolve(Self, String) -> RuleId?
 pub fn Grammar::rule(Self, RuleId) -> RuleDefinition?
-pub fn Grammar::rule_count(Self) -> Int
+pub fn Grammar::rule_count(Self) -> Int32
 pub fn Grammar::rules(Self) -> Array[RuleDefinition]
 pub fn Grammar::start(Self) -> RuleId
 pub fn Grammar::validate_productivity(Self) -> Result[GrammarAnalysis, AnalysisError]
 
+#derive(Eq, @debug.Debug)
 pub(all) struct GrammarAnalysis {
   rules : Array[RuleProperties]
-  reachable_count : Int
-  unreachable_count : Int
-  recursive_count : Int
-  nullable_count : Int
-  productive_count : Int
-} derive(Eq, @debug.Debug)
+  reachable_count : Int32
+  unreachable_count : Int32
+  recursive_count : Int32
+  nullable_count : Int32
+  productive_count : Int32
+}
 pub fn GrammarAnalysis::properties(Self, RuleId) -> RuleProperties?
 pub fn GrammarAnalysis::rules(Self) -> Array[RuleProperties]
 
@@ -371,33 +399,34 @@ pub struct GrammarBuilder {
 }
 pub fn GrammarBuilder::ascii_range(Self, Char, Char, name? : String) -> RuleId
 pub fn GrammarBuilder::build(Self) -> Result[Grammar, GrammarError]
-pub fn GrammarBuilder::bytes(Self, Array[Int], name? : String) -> RuleId
+pub fn GrammarBuilder::bytes(Self, Array[Int32], name? : String) -> RuleId
 pub fn GrammarBuilder::choice(Self, Array[Alternative], name? : String) -> RuleId
 pub fn GrammarBuilder::dictionary(Self, Array[String], name? : String) -> RuleId
-pub fn GrammarBuilder::integer(Self, Int, Int, name? : String) -> RuleId
+pub fn GrammarBuilder::integer(Self, Int32, Int32, name? : String) -> RuleId
 pub fn GrammarBuilder::literal(Self, String, name? : String) -> RuleId
 pub fn GrammarBuilder::new() -> Self
-pub fn GrammarBuilder::optional(Self, RuleId, present_weight? : Int, name? : String) -> RuleId
+pub fn GrammarBuilder::optional(Self, RuleId, present_weight? : Int32, name? : String) -> RuleId
 pub fn GrammarBuilder::reference(Self, String, name? : String) -> RuleId
-pub fn GrammarBuilder::repeat(Self, RuleId, minimum? : Int, maximum? : Int, name? : String) -> RuleId
+pub fn GrammarBuilder::repeat(Self, RuleId, minimum? : Int32, maximum? : Int32, name? : String) -> RuleId
 pub fn GrammarBuilder::sequence(Self, Array[RuleId], name? : String) -> RuleId
 pub fn GrammarBuilder::set_start(Self, RuleId) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum GrammarError {
   EmptyGrammar
-  InvalidStartRule(Int)
-  InvalidRuleReference(Int, Int)
+  InvalidStartRule(Int32)
+  InvalidRuleReference(Int32, Int32)
   MissingNamedRule(String)
   DuplicateRuleName(String)
-  EmptyByteSet(Int)
-  InvalidByteValue(Int, Int)
-  EmptyDictionary(Int)
-  EmptyChoice(Int)
-  NonPositiveWeight(Int, Int)
-  InvalidRepeatBounds(Int, Int, Int)
-  InvalidIntegerBounds(Int, Int, Int)
-  InvalidOptionalWeight(Int, Int)
-} derive(Eq, @debug.Debug)
+  EmptyByteSet(Int32)
+  InvalidByteValue(Int32, Int32)
+  EmptyDictionary(Int32)
+  EmptyChoice(Int32)
+  NonPositiveWeight(Int32, Int32)
+  InvalidRepeatBounds(Int32, Int32, Int32)
+  InvalidIntegerBounds(Int32, Int32, Int32)
+  InvalidOptionalWeight(Int32, Int32)
+}
 
 pub struct MetamorphicTransform {
   name : String
@@ -407,27 +436,31 @@ pub struct MetamorphicTransform {
 pub fn MetamorphicTransform::name(Self) -> String
 pub fn MetamorphicTransform::new(String, (Bytes) -> Bytes, (TargetObservation, TargetObservation) -> Bool) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MutationConfig {
   budget : GenerationBudget
-  attempts : Int
-  maximum_output_bytes : Int
-} derive(Eq, @debug.Debug)
+  attempts : Int32
+  maximum_output_bytes : Int32
+}
 pub fn MutationConfig::default() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MutationError {
   EmptyTree
   NoApplicableMutation
   GenerationFailed(GenerationError)
-  OutputBudgetExceeded(Int)
-} derive(Eq, @debug.Debug)
+  OutputBudgetExceeded(Int32)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct MutationResult {
   tree : DerivationTree
   strategy : MutationStrategy
-  changed_node : Int
+  changed_node : Int32
   detail : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum MutationStrategy {
   RegenerateSubtree
   DeleteRepeatedChild
@@ -435,105 +468,115 @@ pub(all) enum MutationStrategy {
   ReplaceIntegerBoundary
   ReplaceDictionaryEntry
   DuplicateRepeatedChild
-} derive(Eq, @debug.Debug)
+}
 
 pub(all) struct Random {
   mut state : Int64
   initial_seed : Int64
-  mut draws : Int
+  mut draws : Int32
 }
-pub fn Random::advance(Self, Int) -> Unit
-pub fn Random::below(Self, Int) -> Int
-pub fn Random::between(Self, Int, Int) -> Int
-pub fn Random::chance(Self, Int, Int) -> Bool
-pub fn Random::choose_index(Self, Int) -> Int?
-pub fn Random::draw_count(Self) -> Int
-pub fn Random::fork(Self, Int) -> Self
+pub fn Random::advance(Self, Int32) -> Unit
+pub fn Random::below(Self, Int32) -> Int32
+pub fn Random::between(Self, Int32, Int32) -> Int32
+pub fn Random::chance(Self, Int32, Int32) -> Bool
+pub fn Random::choose_index(Self, Int32) -> Int32?
+pub fn Random::draw_count(Self) -> Int32
+pub fn Random::fork(Self, Int32) -> Self
 pub fn Random::new(Int64) -> Self
-pub fn Random::next_raw(Self) -> Int
+pub fn Random::next_raw(Self) -> Int32
 pub fn Random::restore(RandomSnapshot) -> Self
-pub fn Random::sample_without_replacement(Self, Int, Int) -> Array[Int]
+pub fn Random::sample_without_replacement(Self, Int32, Int32) -> Array[Int32]
 pub fn Random::seed(Self) -> Int64
 pub fn[T] Random::shuffle(Self, Array[T]) -> Array[T]
 pub fn Random::snapshot(Self) -> RandomSnapshot
-pub fn Random::weighted_index(Self, Array[Int]) -> Int?
+pub fn Random::weighted_index(Self, Array[Int32]) -> Int32?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct RandomSnapshot {
   seed : Int64
   state : Int64
-  draws : Int
-} derive(Eq, @debug.Debug)
+  draws : Int32
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ReductionConfig {
-  max_attempts : Int
-  generation_trials : Int
+  max_attempts : Int32
+  generation_trials : Int32
   generation_budget : GenerationBudget
-} derive(Eq, @debug.Debug)
+}
 pub fn ReductionConfig::default() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ReductionError {
   InputDoesNotFail
   FingerprintMismatch(FailureFingerprint, FailureFingerprint)
   NoReductionPossible
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ReductionKind {
   RemoveRepeatedChild
   RemoveOptionalChild
   ReplaceWithSmallerSubtree
   SimplifyInteger
   SimplifyDictionary
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ReductionResult {
   original : DerivationTree
   reduced : DerivationTree
   fingerprint : FailureFingerprint
-  attempts : Int
+  attempts : Int32
   accepted_steps : Array[ReductionStep]
-} derive(Eq, @debug.Debug)
-pub fn ReductionResult::bytes_removed(Self) -> Int
-pub fn ReductionResult::nodes_removed(Self) -> Int
+}
+pub fn ReductionResult::bytes_removed(Self) -> Int32
+pub fn ReductionResult::nodes_removed(Self) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ReductionStep {
   kind : ReductionKind
-  node_id : Int
-  before_bytes : Int
-  after_bytes : Int
-  before_nodes : Int
-  after_nodes : Int
-} derive(Eq, @debug.Debug)
+  node_id : Int32
+  before_bytes : Int32
+  after_bytes : Int32
+  before_nodes : Int32
+  after_nodes : Int32
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum RejectionReason {
   DuplicateInput
   NoNovelty
   EntryCapacity
   ByteCapacity
   FailureCapacity
-  InputTooLarge(Int)
-} derive(Eq, @debug.Debug)
+  InputTooLarge(Int32)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) enum ReplayError {
   InvalidJson
   MissingField(String)
   InvalidField(String)
-  UnsupportedReplayVersion(Int)
-  ArtifactLimitExceeded(Int)
-  InputLimitExceeded(Int)
-  InvalidHexInput(Int)
+  UnsupportedReplayVersion(Int32)
+  ArtifactLimitExceeded(Int32)
+  InputLimitExceeded(Int32)
+  InvalidHexInput(Int32)
   TargetNameMismatch(String, String)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ReplayOutcome {
   observation : TargetObservation
   feedback_matches : Bool
   failure_matches : Bool
   result_matches : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn ReplayOutcome::matches(Self) -> Bool
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ReplayRecord {
-  schema_version : Int
+  schema_version : Int32
   target_name : String
   seed : Int64
   input : Bytes
@@ -541,67 +584,74 @@ pub(all) struct ReplayRecord {
   failure_fingerprint : FailureFingerprint?
   result_digest : String?
   generation_budget : GenerationBudget
-} derive(Eq, @debug.Debug)
-pub fn ReplayRecord::decode_json(String, max_input_bytes? : Int, max_artifact_bytes? : Int) -> Result[Self, ReplayError]
+}
+pub fn ReplayRecord::decode_json(String, max_input_bytes? : Int32, max_artifact_bytes? : Int32) -> Result[Self, ReplayError]
 pub fn ReplayRecord::encode_json(Self) -> String
 pub fn ReplayRecord::new(target_name~ : String, seed~ : Int64, input~ : Bytes, observation~ : TargetObservation, generation_budget? : GenerationBudget) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct RuleDefinition {
   id : RuleId
   name : String?
   kind : RuleKind
-} derive(Eq, @debug.Debug)
+}
 
-pub(all) struct RuleId(Int) derive(Eq, Hash, @debug.Debug)
-pub fn RuleId::value(Self) -> Int
+#derive(Eq, Hash, @debug.Debug)
+pub(all) struct RuleId(Int32)
+pub fn RuleId::value(Self) -> Int32
 
+#derive(Eq, @debug.Debug)
 pub(all) enum RuleKind {
   Literal(String)
-  Bytes(Array[Int])
-  Integer(Int, Int)
+  Bytes(Array[Int32])
+  Integer(Int32, Int32)
   Dictionary(Array[String])
   Sequence(Array[RuleId])
   Choice(Array[Alternative])
-  Repeat(RuleId, Int, Int)
-  Optional(RuleId, Int)
+  Repeat(RuleId, Int32, Int32)
+  Optional(RuleId, Int32)
   Reference(String)
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct RuleProperties {
   rule : RuleId
   reachable : Bool
   nullable : Bool
   productive : Bool
   recursive : Bool
-  minimum_bytes : Int?
-  minimum_nodes : Int?
-} derive(Eq, @debug.Debug)
+  minimum_bytes : Int32?
+  minimum_nodes : Int32?
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ScheduleConfig {
-  base_energy : Int
-  maximum_energy : Int
-  novelty_bonus : Int
-  discovery_bonus : Int
-  failure_bonus : Int
-  cost_penalty : Int
-  selection_penalty : Int
-} derive(Eq, @debug.Debug)
+  base_energy : Int32
+  maximum_energy : Int32
+  novelty_bonus : Int32
+  discovery_bonus : Int32
+  failure_bonus : Int32
+  cost_penalty : Int32
+  selection_penalty : Int32
+}
 pub fn ScheduleConfig::default() -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct ScheduleDecision {
-  entry_id : Int
-  energy : Int
+  entry_id : Int32
+  energy : Int32
   reason : String
-} derive(Eq, @debug.Debug)
+}
 
+#derive(Eq, @debug.Debug)
 pub(all) struct StrategyEvidence {
   name : String
-  executions : Int
-  unique_features : Int
-  unique_signatures : Int
-  unique_failures : Int
-  corpus_entries : Int
-} derive(Eq, @debug.Debug)
+  executions : Int32
+  unique_features : Int32
+  unique_signatures : Int32
+  unique_failures : Int32
+  corpus_entries : Int32
+}
 
 pub struct Target {
   name : String
@@ -612,15 +662,16 @@ pub fn Target::new(String, (Bytes) -> TargetObservation) -> Self
 pub fn Target::replay(Self, ReplayRecord) -> Result[ReplayOutcome, ReplayError]
 pub fn Target::run(Self, Bytes) -> TargetObservation
 
+#derive(Eq, @debug.Debug)
 pub(all) struct TargetObservation {
   disposition : ExecutionDisposition
   features : Array[Feature]
   result_digest : String?
-  cost_class : Int
-} derive(Eq, @debug.Debug)
+  cost_class : Int32
+}
 pub fn TargetObservation::canonical_features(Self) -> Array[Feature]
 pub fn TargetObservation::failure_fingerprint(Self) -> FailureFingerprint?
-pub fn TargetObservation::feature_count(Self) -> Int
+pub fn TargetObservation::feature_count(Self) -> Int32
 pub fn TargetObservation::is_failure(Self) -> Bool
 pub fn TargetObservation::signature(Self) -> FeedbackSignature
 

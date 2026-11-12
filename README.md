@@ -13,6 +13,9 @@ branches. MoonGrammata evolves a persistent corpus from those observations. It
 does not call those features “coverage” unless the target actually supplies code
 coverage data.
 
+The source and CI checks were validated with the official MoonBit toolchain
+(`moon 0.1.20261104`, `moonc v0.10.20+65efd5b93`). Use this toolchain or a compatible newer release to build from source.
+
 ## Why this exists
 
 Random byte mutation often spends most of its time producing inputs rejected by

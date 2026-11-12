@@ -62,7 +62,7 @@ fn benchmark_target() -> @grammata.Target {
         (suffix_start - prefix.length()).to_string(),
       ),
     ]
-    let seen : @hashmap.HashMap[Int, Unit] = @hashmap.HashMap([])
+    let seen : @hashmap.HashMap[Int32, Unit] = @hashmap.HashMap([])
     for index = prefix.length(); index < suffix_start; index = index + 1 {
       let value = input[index].to_int()
       if value < 'A'.to_int() || value > 'D'.to_int() {
@@ -85,7 +85,7 @@ fn benchmark_target() -> @grammata.Target {
 
 ///|
 fn byte_mutation_baseline(
-  executions : Int,
+  executions : Int32,
   seed : Int64,
 ) -> @grammata.StrategyEvidence {
   let random = @grammata.Random::new(seed)
@@ -120,7 +120,7 @@ fn byte_mutation_baseline(
 
 ///|
 fn structured_campaign(
-  executions : Int,
+  executions : Int32,
   seed : Int64,
 ) -> @grammata.CampaignResult {
   let config : @grammata.CampaignConfig = {
@@ -132,7 +132,7 @@ fn structured_campaign(
 }
 
 ///|
-fn benchmark_table(executions : Int) -> String {
+fn benchmark_table(executions : Int32) -> String {
   let baseline = byte_mutation_baseline(executions, 20260918L)
   let structured = structured_campaign(executions, 20260918L).strategy_evidence(
     "structured-feedback",

@@ -1,28 +1,31 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum ReductionKind {
   RemoveRepeatedChild
   RemoveOptionalChild
   ReplaceWithSmallerSubtree
   SimplifyInteger
   SimplifyDictionary
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct ReductionStep {
   kind : ReductionKind
-  node_id : Int
-  before_bytes : Int
-  after_bytes : Int
-  before_nodes : Int
-  after_nodes : Int
-} derive(Debug, Eq)
+  node_id : Int32
+  before_bytes : Int32
+  after_bytes : Int32
+  before_nodes : Int32
+  after_nodes : Int32
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct ReductionConfig {
-  max_attempts : Int
-  generation_trials : Int
+  max_attempts : Int32
+  generation_trials : Int32
   generation_budget : GenerationBudget
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn ReductionConfig::default() -> ReductionConfig {
@@ -38,36 +41,38 @@ pub fn ReductionConfig::default() -> ReductionConfig {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct ReductionResult {
   original : DerivationTree
   reduced : DerivationTree
   fingerprint : FailureFingerprint
-  attempts : Int
+  attempts : Int32
   accepted_steps : Array[ReductionStep]
-} derive(Debug, Eq)
+}
 
 ///|
-pub fn ReductionResult::bytes_removed(self : ReductionResult) -> Int {
+pub fn ReductionResult::bytes_removed(self : ReductionResult) -> Int32 {
   self.original.byte_length() - self.reduced.byte_length()
 }
 
 ///|
-pub fn ReductionResult::nodes_removed(self : ReductionResult) -> Int {
+pub fn ReductionResult::nodes_removed(self : ReductionResult) -> Int32 {
   self.original.node_count() - self.reduced.node_count()
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum ReductionError {
   InputDoesNotFail
   FingerprintMismatch(FailureFingerprint, FailureFingerprint)
   NoReductionPossible
-} derive(Debug, Eq)
+}
 
 ///|
 priv struct ReductionCandidate {
   tree : DerivationTree
   kind : ReductionKind
-  node_id : Int
+  node_id : Int32
 }
 
 ///|
@@ -267,8 +272,8 @@ pub fn Grammar::reduce_failure(
   tree : DerivationTree,
   target : Target,
   fingerprint? : FailureFingerprint,
-  seed? : Int64 = 1L,
-  config? : ReductionConfig = ReductionConfig::default(),
+  seed~ : Int64 = 1L,
+  config~ : ReductionConfig = ReductionConfig::default(),
 ) -> Result[ReductionResult, ReductionError] {
   let initial_observation = target.run(tree.render())
   let actual = match initial_observation.failure_fingerprint() {

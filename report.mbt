@@ -1,5 +1,5 @@
 ///|
-fn report_percent(numerator : Int, denominator : Int) -> String {
+fn report_percent(numerator : Int32, denominator : Int32) -> String {
   if denominator <= 0 {
     "0.00%"
   } else {
@@ -61,7 +61,7 @@ fn origin_name(origin : CorpusOrigin) -> String {
 ///|
 pub fn CampaignResult::markdown_report(
   self : CampaignResult,
-  title? : String = "MoonGrammata Campaign Report",
+  title~ : String = "MoonGrammata Campaign Report",
 ) -> String {
   let stats = self.statistics
   let lines : Array[String] = [
@@ -242,14 +242,15 @@ pub fn CampaignResult::json_report(self : CampaignResult) -> String {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct StrategyEvidence {
   name : String
-  executions : Int
-  unique_features : Int
-  unique_signatures : Int
-  unique_failures : Int
-  corpus_entries : Int
-} derive(Debug, Eq)
+  executions : Int32
+  unique_features : Int32
+  unique_signatures : Int32
+  unique_failures : Int32
+  corpus_entries : Int32
+}
 
 ///|
 pub fn CampaignResult::strategy_evidence(

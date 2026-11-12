@@ -1,27 +1,29 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum CorpusOrigin {
   Seeded(Int64)
   Generated(Int64)
-  Mutated(Int, String)
-  Crossed(Int, Int)
-  Reduced(Int)
+  Mutated(Int32, String)
+  Crossed(Int32, Int32)
+  Reduced(Int32)
   Replayed
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CorpusEntry {
-  id : Int
+  id : Int32
   tree : DerivationTree
   observation : TargetObservation
   signature : FeedbackSignature
   failure : FailureFingerprint?
   origin : CorpusOrigin
   input_key : String
-  mut executions : Int
-  mut selections : Int
-  mut discoveries : Int
-  mut energy : Int
-} derive(Debug, Eq)
+  mut executions : Int32
+  mut selections : Int32
+  mut discoveries : Int32
+  mut energy : Int32
+}
 
 ///|
 pub fn CorpusEntry::tree(self : CorpusEntry) -> DerivationTree {
@@ -54,17 +56,18 @@ pub fn CorpusEntry::record_discovery(self : CorpusEntry) -> Unit {
 }
 
 ///|
-pub fn CorpusEntry::set_energy(self : CorpusEntry, value : Int) -> Unit {
+pub fn CorpusEntry::set_energy(self : CorpusEntry, value : Int32) -> Unit {
   self.energy = value.max(1)
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CorpusLimits {
-  max_entries : Int
-  max_total_bytes : Int
-  max_failures : Int
-  max_input_bytes : Int
-} derive(Debug, Eq)
+  max_entries : Int32
+  max_total_bytes : Int32
+  max_failures : Int32
+  max_input_bytes : Int32
+}
 
 ///|
 pub fn CorpusLimits::default() -> CorpusLimits {
@@ -77,53 +80,57 @@ pub fn CorpusLimits::default() -> CorpusLimits {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum AdmissionReason {
   FirstInput
-  NovelFeature(Int)
+  NovelFeature(Int32)
   NovelSignature
   NewFailure(FailureFingerprint)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum RejectionReason {
   DuplicateInput
   NoNovelty
   EntryCapacity
   ByteCapacity
   FailureCapacity
-  InputTooLarge(Int)
-} derive(Debug, Eq)
+  InputTooLarge(Int32)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum AdmissionDecision {
-  Admitted(Int, AdmissionReason)
+  Admitted(Int32, AdmissionReason)
   Rejected(RejectionReason)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CorpusStatistics {
-  entries : Int
-  failures : Int
-  total_bytes : Int
-  unique_inputs : Int
-  unique_features : Int
-  unique_signatures : Int
-  unique_failures : Int
-} derive(Debug, Eq)
+  entries : Int32
+  failures : Int32
+  total_bytes : Int32
+  unique_inputs : Int32
+  unique_features : Int32
+  unique_signatures : Int32
+  unique_failures : Int32
+}
 
 ///|
 pub struct Corpus {
   entries : Array[CorpusEntry]
   limits : CorpusLimits
   registry : FeatureRegistry
-  input_ids : @hashmap.HashMap[String, Int]
-  failure_ids : @hashmap.HashMap[FailureFingerprint, Int]
-  mut total_bytes : Int
-  mut failure_count : Int
+  input_ids : @hashmap.HashMap[String, Int32]
+  failure_ids : @hashmap.HashMap[FailureFingerprint, Int32]
+  mut total_bytes : Int32
+  mut failure_count : Int32
 }
 
 ///|
-pub fn Corpus::new(limits? : CorpusLimits = CorpusLimits::default()) -> Corpus {
+pub fn Corpus::new(limits~ : CorpusLimits = CorpusLimits::default()) -> Corpus {
   {
     entries: [],
     limits,
@@ -136,7 +143,7 @@ pub fn Corpus::new(limits? : CorpusLimits = CorpusLimits::default()) -> Corpus {
 }
 
 ///|
-fn hex_digit(value : Int) -> Char {
+fn hex_digit(value : Int32) -> Char {
   if value < 10 {
     ('0'.to_int() + value).unsafe_to_char()
   } else {
@@ -158,7 +165,7 @@ fn bytes_key(input : Bytes) -> String {
 }
 
 ///|
-pub fn Corpus::length(self : Corpus) -> Int {
+pub fn Corpus::length(self : Corpus) -> Int32 {
   self.entries.length()
 }
 
@@ -168,7 +175,7 @@ pub fn Corpus::is_empty(self : Corpus) -> Bool {
 }
 
 ///|
-pub fn Corpus::entry(self : Corpus, id : Int) -> CorpusEntry? {
+pub fn Corpus::entry(self : Corpus, id : Int32) -> CorpusEntry? {
   if id < 0 || id >= self.entries.length() {
     None
   } else {
@@ -203,7 +210,7 @@ pub fn Corpus::failure_entry(
 ///|
 fn Corpus::capacity_rejection(
   self : Corpus,
-  input_bytes : Int,
+  input_bytes : Int32,
   is_failure : Bool,
 ) -> RejectionReason? {
   if input_bytes > self.limits.max_input_bytes {
@@ -299,7 +306,7 @@ pub fn Corpus::statistics(self : Corpus) -> CorpusStatistics {
 }
 
 ///|
-pub fn Corpus::feature_frequency(self : Corpus, value : Feature) -> Int {
+pub fn Corpus::feature_frequency(self : Corpus, value : Feature) -> Int32 {
   self.registry.feature_frequency(value)
 }
 
@@ -307,7 +314,7 @@ pub fn Corpus::feature_frequency(self : Corpus, value : Feature) -> Int {
 pub fn Corpus::signature_frequency(
   self : Corpus,
   value : FeedbackSignature,
-) -> Int {
+) -> Int32 {
   self.registry.signature_frequency(value)
 }
 

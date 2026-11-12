@@ -1,4 +1,5 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum MutationStrategy {
   RegenerateSubtree
   DeleteRepeatedChild
@@ -6,22 +7,24 @@ pub(all) enum MutationStrategy {
   ReplaceIntegerBoundary
   ReplaceDictionaryEntry
   DuplicateRepeatedChild
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct MutationResult {
   tree : DerivationTree
   strategy : MutationStrategy
-  changed_node : Int
+  changed_node : Int32
   detail : String
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct MutationConfig {
   budget : GenerationBudget
-  attempts : Int
-  maximum_output_bytes : Int
-} derive(Debug, Eq)
+  attempts : Int32
+  maximum_output_bytes : Int32
+}
 
 ///|
 pub fn MutationConfig::default() -> MutationConfig {
@@ -33,12 +36,13 @@ pub fn MutationConfig::default() -> MutationConfig {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum MutationError {
   EmptyTree
   NoApplicableMutation
   GenerationFailed(GenerationError)
-  OutputBudgetExceeded(Int)
-} derive(Debug, Eq)
+  OutputBudgetExceeded(Int32)
+}
 
 ///|
 fn filtered_nodes(
@@ -70,9 +74,9 @@ fn finalize_mutation(
   original : DerivationTree,
   candidate : DerivationTree,
   strategy : MutationStrategy,
-  node : Int,
+  node : Int32,
   detail : String,
-  maximum_output_bytes : Int,
+  maximum_output_bytes : Int32,
 ) -> Result[MutationResult, MutationError] {
   let renumbered = candidate.renumber()
   if renumbered.byte_length() > maximum_output_bytes {
@@ -203,8 +207,8 @@ fn toggle_optional(
 }
 
 ///|
-fn integer_boundaries(minimum : Int, maximum : Int) -> Array[Int] {
-  let candidates : Array[Int] = [minimum, maximum]
+fn integer_boundaries(minimum : Int32, maximum : Int32) -> Array[Int32] {
+  let candidates : Array[Int32] = [minimum, maximum]
   for value in [-1, 0, 1] {
     if value >= minimum && value <= maximum && !candidates.contains(value) {
       candidates.push(value)
@@ -241,7 +245,7 @@ fn replace_integer_boundary(
     IntegerLeaf(value) => value
     _ => 0
   }
-  let choices : Array[Int] = []
+  let choices : Array[Int32] = []
   for value in integer_boundaries(minimum, maximum) {
     if value != old {
       choices.push(value)
@@ -354,7 +358,7 @@ pub fn Grammar::mutate_with(
   tree : DerivationTree,
   strategy : MutationStrategy,
   seed~ : Int64,
-  config? : MutationConfig = MutationConfig::default(),
+  config~ : MutationConfig = MutationConfig::default(),
 ) -> Result[MutationResult, MutationError] {
   let random = Random::new(seed)
   match strategy {
@@ -375,7 +379,7 @@ pub fn Grammar::mutate(
   self : Grammar,
   tree : DerivationTree,
   seed~ : Int64,
-  config? : MutationConfig = MutationConfig::default(),
+  config~ : MutationConfig = MutationConfig::default(),
 ) -> Result[MutationResult, MutationError] {
   let strategies = [
     RegenerateSubtree,

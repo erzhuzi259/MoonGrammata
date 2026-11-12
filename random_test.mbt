@@ -2,8 +2,8 @@
 test "random stream is deterministic and seed zero is usable" {
   let left = Random::new(0L)
   let right = Random::new(0L)
-  let a : Array[Int] = []
-  let b : Array[Int] = []
+  let a : Array[Int32] = []
+  let b : Array[Int32] = []
   for index = 0; index < 64; index = index + 1 {
     a.push(left.next_raw())
     b.push(right.next_raw())
@@ -59,7 +59,7 @@ test "sample without replacement is unique and bounded" {
   let random = Random::new(8L)
   let sample = random.sample_without_replacement(20, 12)
   assert_eq(sample.length(), 12)
-  let seen : @hashmap.HashMap[Int, Unit] = @hashmap.HashMap([])
+  let seen : @hashmap.HashMap[Int32, Unit] = @hashmap.HashMap([])
   for value in sample {
     assert_true(value >= 0 && value < 20)
     assert_false(seen.contains(value))

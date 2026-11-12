@@ -12,11 +12,12 @@ fn operation_grammar() -> @grammata.Grammar {
 }
 
 ///|
+#derive(Debug, Eq)
 enum ResourceState {
   Empty
   Live
   Freed
-} derive(Debug, Eq)
+}
 
 ///|
 fn state_name(state : ResourceState) -> String {
@@ -82,7 +83,7 @@ fn operation_target() -> @grammata.Target {
 }
 
 ///|
-fn run_state_sequence_demo(executions : Int) -> @grammata.CampaignResult {
+fn run_state_sequence_demo(executions : Int32) -> @grammata.CampaignResult {
   let config : @grammata.CampaignConfig = {
     ..@grammata.CampaignConfig::default(seed=40404L),
     executions,

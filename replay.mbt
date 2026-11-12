@@ -1,9 +1,10 @@
 ///|
-pub let replay_schema_version : Int = 1
+pub let replay_schema_version : Int32 = 1
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct ReplayRecord {
-  schema_version : Int
+  schema_version : Int32
   target_name : String
   seed : Int64
   input : Bytes
@@ -11,7 +12,7 @@ pub(all) struct ReplayRecord {
   failure_fingerprint : FailureFingerprint?
   result_digest : String?
   generation_budget : GenerationBudget
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn ReplayRecord::new(
@@ -19,7 +20,7 @@ pub fn ReplayRecord::new(
   seed~ : Int64,
   input~ : Bytes,
   observation~ : TargetObservation,
-  generation_budget? : GenerationBudget = GenerationBudget::default(),
+  generation_budget~ : GenerationBudget = GenerationBudget::default(),
 ) -> ReplayRecord {
   {
     schema_version: replay_schema_version,
@@ -34,24 +35,26 @@ pub fn ReplayRecord::new(
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum ReplayError {
   InvalidJson
   MissingField(String)
   InvalidField(String)
-  UnsupportedReplayVersion(Int)
-  ArtifactLimitExceeded(Int)
-  InputLimitExceeded(Int)
-  InvalidHexInput(Int)
+  UnsupportedReplayVersion(Int32)
+  ArtifactLimitExceeded(Int32)
+  InputLimitExceeded(Int32)
+  InvalidHexInput(Int32)
   TargetNameMismatch(String, String)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct ReplayOutcome {
   observation : TargetObservation
   feedback_matches : Bool
   failure_matches : Bool
   result_matches : Bool
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn ReplayOutcome::matches(self : ReplayOutcome) -> Bool {
@@ -141,12 +144,12 @@ fn replay_required(
 fn replay_int(
   fields : Map[String, Json],
   name : String,
-) -> Result[Int, ReplayError] {
+) -> Result[Int32, ReplayError] {
   let value = match replay_required(fields, name) {
     Err(error) => return Err(error)
     Ok(value) => value
   }
-  let decoded : Int = @json.from_json(value) catch {
+  let decoded : Int32 = @json.from_json(value) catch {
     _ => return Err(InvalidField(name + " must be an integer"))
   }
   Ok(decoded)
@@ -178,7 +181,7 @@ fn replay_optional_string(
 }
 
 ///|
-fn hex_value(byte : Byte) -> Int? {
+fn hex_value(byte : Byte) -> Int32? {
   let value = byte.to_int()
   if value >= '0'.to_int() && value <= '9'.to_int() {
     Some(value - '0'.to_int())
@@ -194,7 +197,7 @@ fn hex_value(byte : Byte) -> Int? {
 ///|
 fn decode_replay_hex(
   value : String,
-  maximum : Int,
+  maximum : Int32,
 ) -> Result[Bytes, ReplayError] {
   let encoded = @utf8.encode(value)
   if encoded.length() % 2 != 0 {
@@ -231,8 +234,8 @@ fn parse_seed(value : String) -> Result[Int64, ReplayError] {
 ///|
 pub fn ReplayRecord::decode_json(
   text : String,
-  max_input_bytes? : Int = 1024 * 1024,
-  max_artifact_bytes? : Int = 4 * 1024 * 1024,
+  max_input_bytes~ : Int32 = 1024 * 1024,
+  max_artifact_bytes~ : Int32 = 4 * 1024 * 1024,
 ) -> Result[ReplayRecord, ReplayError] {
   if @utf8.encode(text).length() > max_artifact_bytes.max(0) {
     return Err(ArtifactLimitExceeded(max_artifact_bytes.max(0)))

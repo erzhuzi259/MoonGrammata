@@ -1,8 +1,9 @@
 ///|
+#derive(Debug, Eq, Hash)
 pub(all) struct Feature {
   domain : String
   value : String
-} derive(Debug, Eq, Hash)
+}
 
 ///|
 pub fn feature(domain : String, value : String) -> Feature {
@@ -21,26 +22,28 @@ pub fn Feature::canonical(self : Feature) -> String {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum ExecutionDisposition {
   Accepted
   Rejected(String)
   Failed(String, String)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct TargetObservation {
   disposition : ExecutionDisposition
   features : Array[Feature]
   result_digest : String?
-  cost_class : Int
-} derive(Debug, Eq)
+  cost_class : Int32
+}
 
 ///|
 pub fn observation(
   disposition : ExecutionDisposition,
-  features? : Array[Feature] = [],
+  features~ : Array[Feature] = [],
   result_digest? : String,
-  cost_class? : Int = 0,
+  cost_class~ : Int32 = 0,
 ) -> TargetObservation {
   {
     disposition,
@@ -52,9 +55,9 @@ pub fn observation(
 
 ///|
 pub fn accepted(
-  features? : Array[Feature] = [],
+  features~ : Array[Feature] = [],
   result_digest? : String,
-  cost_class? : Int = 0,
+  cost_class~ : Int32 = 0,
 ) -> TargetObservation {
   {
     disposition: Accepted,
@@ -67,7 +70,7 @@ pub fn accepted(
 ///|
 pub fn rejected(
   reason : String,
-  features? : Array[Feature] = [],
+  features~ : Array[Feature] = [],
 ) -> TargetObservation {
   {
     disposition: Rejected(reason),
@@ -81,7 +84,7 @@ pub fn rejected(
 pub fn failed(
   kind : String,
   detail : String,
-  features? : Array[Feature] = [],
+  features~ : Array[Feature] = [],
 ) -> TargetObservation {
   {
     disposition: Failed(kind, detail),
@@ -92,7 +95,7 @@ pub fn failed(
 }
 
 ///|
-fn compare_string(left : String, right : String) -> Int {
+fn compare_string(left : String, right : String) -> Int32 {
   let left_bytes = @utf8.encode(left)
   let right_bytes = @utf8.encode(right)
   let common = left_bytes.length().min(right_bytes.length())
@@ -143,7 +146,8 @@ fn sorted_unique_features(values : Array[Feature]) -> Array[Feature] {
 }
 
 ///|
-pub(all) struct FeedbackSignature(String) derive(Debug, Eq, Hash)
+#derive(Debug, Eq, Hash)
+pub(all) struct FeedbackSignature(String)
 
 ///|
 pub fn FeedbackSignature::value(self : FeedbackSignature) -> String {
@@ -167,7 +171,8 @@ pub fn TargetObservation::signature(
 }
 
 ///|
-pub(all) struct FailureFingerprint(String) derive(Debug, Eq, Hash)
+#derive(Debug, Eq, Hash)
+pub(all) struct FailureFingerprint(String)
 
 ///|
 pub fn FailureFingerprint::value(self : FailureFingerprint) -> String {
@@ -200,7 +205,7 @@ pub fn TargetObservation::is_failure(self : TargetObservation) -> Bool {
 }
 
 ///|
-pub fn TargetObservation::feature_count(self : TargetObservation) -> Int {
+pub fn TargetObservation::feature_count(self : TargetObservation) -> Int32 {
   sorted_unique_features(self.features).length()
 }
 
@@ -236,17 +241,18 @@ pub fn Target::run(self : Target, input : Bytes) -> TargetObservation {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct FeatureDelta {
   signature : FeedbackSignature
   novel_features : Array[Feature]
   all_features : Array[Feature]
-} derive(Debug, Eq)
+}
 
 ///|
 pub struct FeatureRegistry {
-  seen : @hashmap.HashMap[Feature, Int]
-  signatures : @hashmap.HashMap[FeedbackSignature, Int]
-  mut observations : Int
+  seen : @hashmap.HashMap[Feature, Int32]
+  signatures : @hashmap.HashMap[FeedbackSignature, Int32]
+  mut observations : Int32
 }
 
 ///|
@@ -285,7 +291,7 @@ pub fn FeatureRegistry::observe(
 pub fn FeatureRegistry::feature_frequency(
   self : FeatureRegistry,
   value : Feature,
-) -> Int {
+) -> Int32 {
   self.seen.get(value).unwrap_or(0)
 }
 
@@ -293,21 +299,21 @@ pub fn FeatureRegistry::feature_frequency(
 pub fn FeatureRegistry::signature_frequency(
   self : FeatureRegistry,
   value : FeedbackSignature,
-) -> Int {
+) -> Int32 {
   self.signatures.get(value).unwrap_or(0)
 }
 
 ///|
-pub fn FeatureRegistry::unique_feature_count(self : FeatureRegistry) -> Int {
+pub fn FeatureRegistry::unique_feature_count(self : FeatureRegistry) -> Int32 {
   self.seen.length()
 }
 
 ///|
-pub fn FeatureRegistry::unique_signature_count(self : FeatureRegistry) -> Int {
+pub fn FeatureRegistry::unique_signature_count(self : FeatureRegistry) -> Int32 {
   self.signatures.length()
 }
 
 ///|
-pub fn FeatureRegistry::observation_count(self : FeatureRegistry) -> Int {
+pub fn FeatureRegistry::observation_count(self : FeatureRegistry) -> Int32 {
   self.observations
 }

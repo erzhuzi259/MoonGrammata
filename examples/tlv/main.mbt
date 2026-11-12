@@ -43,7 +43,7 @@ fn tlv_target() -> @grammata.Target {
 }
 
 ///|
-fn run_tlv_demo(executions : Int) -> @grammata.CampaignResult {
+fn run_tlv_demo(executions : Int32) -> @grammata.CampaignResult {
   let config : @grammata.CampaignConfig = {
     ..@grammata.CampaignConfig::default(seed=7252L),
     executions,

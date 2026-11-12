@@ -1,28 +1,30 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum DerivationKind {
   LiteralLeaf
   ByteLeaf
-  IntegerLeaf(Int)
-  DictionaryLeaf(Int)
+  IntegerLeaf(Int32)
+  DictionaryLeaf(Int32)
   SequenceNode
-  ChoiceNode(Int, String)
-  RepeatNode(Int)
+  ChoiceNode(Int32, String)
+  RepeatNode(Int32)
   OptionalNode(Bool)
   ReferenceNode(String)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct DerivationTree {
-  node_id : Int
+  node_id : Int32
   rule : RuleId
   kind : DerivationKind
   payload : Array[Byte]
   children : Array[DerivationTree]
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn DerivationTree::leaf(
-  node_id : Int,
+  node_id : Int32,
   rule : RuleId,
   kind : DerivationKind,
   payload : Array[Byte],
@@ -32,7 +34,7 @@ pub fn DerivationTree::leaf(
 
 ///|
 pub fn DerivationTree::branch(
-  node_id : Int,
+  node_id : Int32,
   rule : RuleId,
   kind : DerivationKind,
   children : Array[DerivationTree],
@@ -41,7 +43,7 @@ pub fn DerivationTree::branch(
 }
 
 ///|
-pub fn DerivationTree::node_id(self : DerivationTree) -> Int {
+pub fn DerivationTree::node_id(self : DerivationTree) -> Int32 {
   self.node_id
 }
 
@@ -95,7 +97,7 @@ pub fn DerivationTree::render_text(
 }
 
 ///|
-pub fn DerivationTree::byte_length(self : DerivationTree) -> Int {
+pub fn DerivationTree::byte_length(self : DerivationTree) -> Int32 {
   let mut total = self.payload.length()
   for child in self.children {
     total += child.byte_length()
@@ -104,7 +106,7 @@ pub fn DerivationTree::byte_length(self : DerivationTree) -> Int {
 }
 
 ///|
-pub fn DerivationTree::node_count(self : DerivationTree) -> Int {
+pub fn DerivationTree::node_count(self : DerivationTree) -> Int32 {
   let mut total = 1
   for child in self.children {
     total += child.node_count()
@@ -113,7 +115,7 @@ pub fn DerivationTree::node_count(self : DerivationTree) -> Int {
 }
 
 ///|
-pub fn DerivationTree::depth(self : DerivationTree) -> Int {
+pub fn DerivationTree::depth(self : DerivationTree) -> Int32 {
   let mut deepest = 0
   for child in self.children {
     deepest = deepest.max(child.depth())
@@ -151,7 +153,7 @@ pub fn DerivationTree::nodes_for_rule(
 ///|
 pub fn DerivationTree::find(
   self : DerivationTree,
-  node_id : Int,
+  node_id : Int32,
 ) -> DerivationTree? {
   if self.node_id == node_id {
     return Some(self)
@@ -168,7 +170,7 @@ pub fn DerivationTree::find(
 ///|
 pub fn DerivationTree::replace(
   self : DerivationTree,
-  node_id : Int,
+  node_id : Int32,
   replacement : DerivationTree,
 ) -> DerivationTree {
   if self.node_id == node_id {
@@ -184,7 +186,7 @@ pub fn DerivationTree::replace(
 ///|
 pub fn DerivationTree::without_child(
   self : DerivationTree,
-  child_index : Int,
+  child_index : Int32,
 ) -> DerivationTree? {
   if child_index < 0 || child_index >= self.children.length() {
     return None
@@ -201,7 +203,7 @@ pub fn DerivationTree::without_child(
 ///|
 pub fn DerivationTree::renumber(self : DerivationTree) -> DerivationTree {
   let next = Ref(0)
-  fn visit(node : DerivationTree, next : Ref[Int]) -> DerivationTree {
+  fn visit(node : DerivationTree, next : Ref[Int32]) -> DerivationTree {
     let id = next.val
     next.val += 1
     let children : Array[DerivationTree] = []

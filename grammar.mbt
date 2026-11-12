@@ -1,24 +1,26 @@
 ///|
 /// Stable integer identity of one grammar rule.
-pub(all) struct RuleId(Int) derive(Debug, Eq, Hash)
+#derive(Debug, Eq, Hash)
+pub(all) struct RuleId(Int32)
 
 ///|
-pub fn RuleId::value(self : RuleId) -> Int {
+pub fn RuleId::value(self : RuleId) -> Int32 {
   self.0
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct Alternative {
   rule : RuleId
-  weight : Int
+  weight : Int32
   label : String
-} derive(Debug, Eq)
+}
 
 ///|
 pub fn alternative(
   rule : RuleId,
-  weight? : Int = 1,
-  label? : String = "",
+  weight~ : Int32 = 1,
+  label~ : String = "",
 ) -> Alternative {
   { rule, weight, label, }
 }
@@ -26,41 +28,44 @@ pub fn alternative(
 ///|
 /// Composable rule kinds. References are resolved by name when the grammar is
 /// sealed, which allows explicit recursion without mutable placeholder nodes.
+#derive(Debug, Eq)
 pub(all) enum RuleKind {
   Literal(String)
-  Bytes(Array[Int])
-  Integer(Int, Int)
+  Bytes(Array[Int32])
+  Integer(Int32, Int32)
   Dictionary(Array[String])
   Sequence(Array[RuleId])
   Choice(Array[Alternative])
-  Repeat(RuleId, Int, Int)
-  Optional(RuleId, Int)
+  Repeat(RuleId, Int32, Int32)
+  Optional(RuleId, Int32)
   Reference(String)
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct RuleDefinition {
   id : RuleId
   name : String?
   kind : RuleKind
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum GrammarError {
   EmptyGrammar
-  InvalidStartRule(Int)
-  InvalidRuleReference(Int, Int)
+  InvalidStartRule(Int32)
+  InvalidRuleReference(Int32, Int32)
   MissingNamedRule(String)
   DuplicateRuleName(String)
-  EmptyByteSet(Int)
-  InvalidByteValue(Int, Int)
-  EmptyDictionary(Int)
-  EmptyChoice(Int)
-  NonPositiveWeight(Int, Int)
-  InvalidRepeatBounds(Int, Int, Int)
-  InvalidIntegerBounds(Int, Int, Int)
-  InvalidOptionalWeight(Int, Int)
-} derive(Debug, Eq)
+  EmptyByteSet(Int32)
+  InvalidByteValue(Int32, Int32)
+  EmptyDictionary(Int32)
+  EmptyChoice(Int32)
+  NonPositiveWeight(Int32, Int32)
+  InvalidRepeatBounds(Int32, Int32, Int32)
+  InvalidIntegerBounds(Int32, Int32, Int32)
+  InvalidOptionalWeight(Int32, Int32)
+}
 
 ///|
 pub struct Grammar {
@@ -70,7 +75,7 @@ pub struct Grammar {
 }
 
 ///|
-pub fn Grammar::rule_count(self : Grammar) -> Int {
+pub fn Grammar::rule_count(self : Grammar) -> Int32 {
   self.rules.length()
 }
 
@@ -140,7 +145,7 @@ pub fn GrammarBuilder::literal(
 ///|
 pub fn GrammarBuilder::bytes(
   self : GrammarBuilder,
-  values : Array[Int],
+  values : Array[Int32],
   name? : String,
 ) -> RuleId {
   self.append(Bytes(values.copy()), name)
@@ -153,7 +158,7 @@ pub fn GrammarBuilder::ascii_range(
   last : Char,
   name? : String,
 ) -> RuleId {
-  let values : Array[Int] = []
+  let values : Array[Int32] = []
   let low = first.to_int()
   let high = last.to_int()
   if low <= high {
@@ -167,8 +172,8 @@ pub fn GrammarBuilder::ascii_range(
 ///|
 pub fn GrammarBuilder::integer(
   self : GrammarBuilder,
-  minimum : Int,
-  maximum : Int,
+  minimum : Int32,
+  maximum : Int32,
   name? : String,
 ) -> RuleId {
   self.append(Integer(minimum, maximum), name)
@@ -205,8 +210,8 @@ pub fn GrammarBuilder::choice(
 pub fn GrammarBuilder::repeat(
   self : GrammarBuilder,
   child : RuleId,
-  minimum? : Int = 0,
-  maximum? : Int = 8,
+  minimum~ : Int32 = 0,
+  maximum~ : Int32 = 8,
   name? : String,
 ) -> RuleId {
   self.append(Repeat(child, minimum, maximum), name)
@@ -216,7 +221,7 @@ pub fn GrammarBuilder::repeat(
 pub fn GrammarBuilder::optional(
   self : GrammarBuilder,
   child : RuleId,
-  present_weight? : Int = 1,
+  present_weight~ : Int32 = 1,
   name? : String,
 ) -> RuleId {
   self.append(Optional(child, present_weight), name)
@@ -243,8 +248,8 @@ pub fn GrammarBuilder::set_start(
 ///|
 fn validate_rule_id(
   id : RuleId,
-  owner : Int,
-  count : Int,
+  owner : Int32,
+  count : Int32,
 ) -> Result[Unit, GrammarError] {
   if id.0 < 0 || id.0 >= count {
     Err(InvalidRuleReference(owner, id.0))
@@ -256,8 +261,8 @@ fn validate_rule_id(
 ///|
 fn validate_kind(
   kind : RuleKind,
-  owner : Int,
-  count : Int,
+  owner : Int32,
+  count : Int32,
   names : @hashmap.HashMap[String, RuleId],
 ) -> Result[Unit, GrammarError] {
   match kind {

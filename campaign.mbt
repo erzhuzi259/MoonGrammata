@@ -1,18 +1,19 @@
 ///|
+#derive(Debug, Eq)
 pub(all) struct CampaignConfig {
   seed : Int64
-  executions : Int
-  initial_inputs : Int
-  crossover_percent : Int
+  executions : Int32
+  initial_inputs : Int32
+  crossover_percent : Int32
   generation_budget : GenerationBudget
   mutation_config : MutationConfig
   crossover_config : CrossoverConfig
   corpus_limits : CorpusLimits
-  max_events : Int
-} derive(Debug, Eq)
+  max_events : Int32
+}
 
 ///|
-pub fn CampaignConfig::default(seed? : Int64 = 1L) -> CampaignConfig {
+pub fn CampaignConfig::default(seed~ : Int64 = 1L) -> CampaignConfig {
   {
     seed,
     executions: 10000,
@@ -27,6 +28,7 @@ pub fn CampaignConfig::default(seed? : Int64 = 1L) -> CampaignConfig {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum CampaignEventKind {
   Generated
   Mutated(MutationStrategy)
@@ -35,44 +37,48 @@ pub(all) enum CampaignEventKind {
   RejectedInput(RejectionReason)
   FailureFound(FailureFingerprint)
   MutationSkipped
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CampaignEvent {
-  execution : Int
-  input_bytes : Int
-  corpus_entries : Int
+  execution : Int32
+  input_bytes : Int32
+  corpus_entries : Int32
   kind : CampaignEventKind
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CampaignStatistics {
-  requested_executions : Int
-  completed_executions : Int
-  generated_inputs : Int
-  mutated_inputs : Int
-  crossed_inputs : Int
-  admitted_inputs : Int
-  rejected_inputs : Int
-  unique_failures : Int
-  mutation_failures : Int
+  requested_executions : Int32
+  completed_executions : Int32
+  generated_inputs : Int32
+  mutated_inputs : Int32
+  crossed_inputs : Int32
+  admitted_inputs : Int32
+  rejected_inputs : Int32
+  unique_failures : Int32
+  mutation_failures : Int32
   final_corpus : CorpusStatistics
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CampaignResult {
   statistics : CampaignStatistics
   corpus : Array[CorpusEntry]
   failures : Array[ReplayRecord]
   events : Array[CampaignEvent]
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum CampaignError {
   InvalidCampaignConfig(String)
   InitialGenerationFailed(GenerationError)
   CorpusCouldNotBeSeeded
-} derive(Debug, Eq)
+}
 
 ///|
 fn CampaignConfig::validate(
@@ -93,13 +99,13 @@ fn CampaignConfig::validate(
 
 ///|
 priv struct CampaignCounters {
-  mut completed : Int
-  mut generated : Int
-  mut mutated : Int
-  mut crossed : Int
-  mut admitted : Int
-  mut rejected : Int
-  mut mutation_failures : Int
+  mut completed : Int32
+  mut generated : Int32
+  mut mutated : Int32
+  mut crossed : Int32
+  mut admitted : Int32
+  mut rejected : Int32
+  mut mutation_failures : Int32
 }
 
 ///|
@@ -118,7 +124,7 @@ fn CampaignCounters::new() -> CampaignCounters {
 ///|
 fn push_event(
   events : Array[CampaignEvent],
-  maximum : Int,
+  maximum : Int32,
   event : CampaignEvent,
 ) -> Unit {
   if events.length() < maximum {
@@ -130,7 +136,7 @@ fn push_event(
 fn record_failure(
   failures : Array[ReplayRecord],
   seen : @hashmap.HashMap[FailureFingerprint, Unit],
-  maximum : Int,
+  maximum : Int32,
   target : Target,
   input : Bytes,
   observation : TargetObservation,
@@ -170,7 +176,7 @@ fn execute_candidate(
   failures : Array[ReplayRecord],
   seen_failures : @hashmap.HashMap[FailureFingerprint, Unit],
   events : Array[CampaignEvent],
-  max_events : Int,
+  max_events : Int32,
 ) -> AdmissionDecision {
   let input = tree.render()
   let observation = target.run(input)
@@ -220,7 +226,7 @@ fn execute_candidate(
 }
 
 ///|
-fn campaign_seed(config : CampaignConfig, ordinal : Int) -> Int64 {
+fn campaign_seed(config : CampaignConfig, ordinal : Int32) -> Int64 {
   config.seed + Int64::from_int(ordinal) * 104729L
 }
 
@@ -228,7 +234,7 @@ fn campaign_seed(config : CampaignConfig, ordinal : Int) -> Int64 {
 fn generated_candidate(
   grammar : Grammar,
   config : CampaignConfig,
-  ordinal : Int,
+  ordinal : Int32,
 ) -> Result[DerivationTree, GenerationError] {
   grammar.generate(
     seed=campaign_seed(config, ordinal),
@@ -243,7 +249,7 @@ fn evolved_candidate(
   scheduler : EnergyScheduler,
   random : Random,
   config : CampaignConfig,
-  ordinal : Int,
+  ordinal : Int32,
   counters : CampaignCounters,
 ) -> (DerivationTree, CorpusOrigin, CampaignEventKind, CorpusEntry?)? {
   let decision = match scheduler.select(corpus) {

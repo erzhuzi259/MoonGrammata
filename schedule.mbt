@@ -1,13 +1,14 @@
 ///|
+#derive(Debug, Eq)
 pub(all) struct ScheduleConfig {
-  base_energy : Int
-  maximum_energy : Int
-  novelty_bonus : Int
-  discovery_bonus : Int
-  failure_bonus : Int
-  cost_penalty : Int
-  selection_penalty : Int
-} derive(Debug, Eq)
+  base_energy : Int32
+  maximum_energy : Int32
+  novelty_bonus : Int32
+  discovery_bonus : Int32
+  failure_bonus : Int32
+  cost_penalty : Int32
+  selection_penalty : Int32
+}
 
 ///|
 pub fn ScheduleConfig::default() -> ScheduleConfig {
@@ -23,29 +24,30 @@ pub fn ScheduleConfig::default() -> ScheduleConfig {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct ScheduleDecision {
-  entry_id : Int
-  energy : Int
+  entry_id : Int32
+  energy : Int32
   reason : String
-} derive(Debug, Eq)
+}
 
 ///|
 pub struct EnergyScheduler {
   config : ScheduleConfig
   random : Random
-  mut rounds : Int
+  mut rounds : Int32
 }
 
 ///|
 pub fn EnergyScheduler::new(
   seed : Int64,
-  config? : ScheduleConfig = ScheduleConfig::default(),
+  config~ : ScheduleConfig = ScheduleConfig::default(),
 ) -> EnergyScheduler {
   { config, random: Random::new(seed), rounds: 0, }
 }
 
 ///|
-fn rare_feature_score(corpus : Corpus, entry : CorpusEntry) -> Int {
+fn rare_feature_score(corpus : Corpus, entry : CorpusEntry) -> Int32 {
   let mut score = 0
   for item in entry.observation.canonical_features() {
     let frequency = corpus.feature_frequency(item)
@@ -63,7 +65,7 @@ fn rare_feature_score(corpus : Corpus, entry : CorpusEntry) -> Int {
 }
 
 ///|
-fn signature_score(corpus : Corpus, entry : CorpusEntry) -> Int {
+fn signature_score(corpus : Corpus, entry : CorpusEntry) -> Int32 {
   let frequency = corpus.signature_frequency(entry.signature)
   if frequency <= 1 {
     8
@@ -81,7 +83,7 @@ pub fn EnergyScheduler::energy_for(
   self : EnergyScheduler,
   corpus : Corpus,
   entry : CorpusEntry,
-) -> Int {
+) -> Int32 {
   let mut energy = self.config.base_energy
   energy += rare_feature_score(corpus, entry)
   energy += signature_score(corpus, entry)
@@ -101,8 +103,8 @@ pub fn EnergyScheduler::energy_for(
 pub fn EnergyScheduler::refresh(
   self : EnergyScheduler,
   corpus : Corpus,
-) -> Array[Int] {
-  let energies : Array[Int] = []
+) -> Array[Int32] {
+  let energies : Array[Int32] = []
   for entry in corpus.entries() {
     let energy = self.energy_for(corpus, entry)
     entry.set_energy(energy)
@@ -112,7 +114,7 @@ pub fn EnergyScheduler::refresh(
 }
 
 ///|
-fn decision_reason(entry : CorpusEntry, energy : Int) -> String {
+fn decision_reason(entry : CorpusEntry, energy : Int32) -> String {
   let category = if entry.is_failure() {
     "failure"
   } else if entry.executions == 0 {
@@ -146,7 +148,7 @@ pub fn EnergyScheduler::select(
 }
 
 ///|
-pub fn EnergyScheduler::rounds(self : EnergyScheduler) -> Int {
+pub fn EnergyScheduler::rounds(self : EnergyScheduler) -> Int32 {
   self.rounds
 }
 

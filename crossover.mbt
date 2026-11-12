@@ -1,10 +1,11 @@
 ///|
+#derive(Debug, Eq)
 pub(all) struct CrossoverConfig {
-  maximum_output_bytes : Int
-  maximum_nodes : Int
-  maximum_depth : Int
-  attempts : Int
-} derive(Debug, Eq)
+  maximum_output_bytes : Int32
+  maximum_nodes : Int32
+  maximum_depth : Int32
+  attempts : Int32
+}
 
 ///|
 pub fn CrossoverConfig::default() -> CrossoverConfig {
@@ -17,19 +18,21 @@ pub fn CrossoverConfig::default() -> CrossoverConfig {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct CrossoverResult {
   tree : DerivationTree
-  recipient_node : Int
-  donor_node : Int
+  recipient_node : Int32
+  donor_node : Int32
   rule : RuleId
-} derive(Debug, Eq)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum CrossoverError {
   NoCompatibleSubtree
-  CrossoverBudgetExceeded(String, Int)
+  CrossoverBudgetExceeded(String, Int32)
   NoEffectiveCrossover
-} derive(Debug, Eq)
+}
 
 ///|
 fn compatible_pairs(
@@ -72,7 +75,7 @@ pub fn crossover(
   recipient : DerivationTree,
   donor : DerivationTree,
   seed~ : Int64,
-  config? : CrossoverConfig = CrossoverConfig::default(),
+  config~ : CrossoverConfig = CrossoverConfig::default(),
 ) -> Result[CrossoverResult, CrossoverError] {
   let pairs = compatible_pairs(recipient, donor)
   if pairs.is_empty() {
@@ -112,7 +115,7 @@ pub fn crossover(
 pub fn crossover_compatible_rule_count(
   left : DerivationTree,
   right : DerivationTree,
-) -> Int {
+) -> Int32 {
   let seen : @hashmap.HashMap[RuleId, Unit] = @hashmap.HashMap([])
   let right_rules : @hashmap.HashMap[RuleId, Unit] = @hashmap.HashMap([])
   for node in right.descendants() {

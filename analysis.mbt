@@ -1,31 +1,34 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum AnalysisError {
-  UnproductiveStartRule(Int)
-  UnproductiveRule(Int)
-  NoTerminatingAlternative(Int)
-  MinimumCostOverflow(Int)
-} derive(Debug, Eq)
+  UnproductiveStartRule(Int32)
+  UnproductiveRule(Int32)
+  NoTerminatingAlternative(Int32)
+  MinimumCostOverflow(Int32)
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct RuleProperties {
   rule : RuleId
   reachable : Bool
   nullable : Bool
   productive : Bool
   recursive : Bool
-  minimum_bytes : Int?
-  minimum_nodes : Int?
-} derive(Debug, Eq)
+  minimum_bytes : Int32?
+  minimum_nodes : Int32?
+}
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct GrammarAnalysis {
   rules : Array[RuleProperties]
-  reachable_count : Int
-  unreachable_count : Int
-  recursive_count : Int
-  nullable_count : Int
-  productive_count : Int
-} derive(Debug, Eq)
+  reachable_count : Int32
+  unreachable_count : Int32
+  recursive_count : Int32
+  nullable_count : Int32
+  productive_count : Int32
+}
 
 ///|
 pub fn GrammarAnalysis::properties(
@@ -148,12 +151,12 @@ fn productive_kind(
 }
 
 ///|
-fn minimum_string_bytes(value : String) -> Int {
+fn minimum_string_bytes(value : String) -> Int32 {
   @utf8.encode(value).length()
 }
 
 ///|
-fn decimal_width(value : Int) -> Int {
+fn decimal_width(value : Int32) -> Int32 {
   if value == 0 {
     return 1
   }
@@ -174,7 +177,7 @@ fn decimal_width(value : Int) -> Int {
 }
 
 ///|
-fn minimum_integer_width(minimum : Int, maximum : Int) -> Int {
+fn minimum_integer_width(minimum : Int32, maximum : Int32) -> Int32 {
   if minimum <= 0 && maximum >= 0 {
     1
   } else {
@@ -183,7 +186,7 @@ fn minimum_integer_width(minimum : Int, maximum : Int) -> Int {
 }
 
 ///|
-fn checked_add_cost(left : Int, right : Int) -> Int? {
+fn checked_add_cost(left : Int32, right : Int32) -> Int32? {
   if left > 1000000000 - right {
     None
   } else {
@@ -192,7 +195,7 @@ fn checked_add_cost(left : Int, right : Int) -> Int? {
 }
 
 ///|
-fn checked_multiply_cost(value : Int, count : Int) -> Int? {
+fn checked_multiply_cost(value : Int32, count : Int32) -> Int32? {
   if count == 0 || value == 0 {
     Some(0)
   } else if value > 1000000000 / count {
@@ -203,7 +206,7 @@ fn checked_multiply_cost(value : Int, count : Int) -> Int? {
 }
 
 ///|
-fn min_optional(left : Int?, right : Int?) -> Int? {
+fn min_optional(left : Int32?, right : Int32?) -> Int32? {
   match (left, right) {
     (None, value) => value
     (value, None) => value
@@ -215,14 +218,14 @@ fn min_optional(left : Int?, right : Int?) -> Int? {
 fn minimum_bytes_kind(
   grammar : Grammar,
   kind : RuleKind,
-  costs : FixedArray[Int?],
-) -> Int? {
+  costs : FixedArray[Int32?],
+) -> Int32? {
   match kind {
     Literal(value) => Some(minimum_string_bytes(value))
     Bytes(_) => Some(1)
     Integer(minimum, maximum) => Some(minimum_integer_width(minimum, maximum))
     Dictionary(values) => {
-      let mut result : Int? = None
+      let mut result : Int32? = None
       for value in values {
         result = min_optional(result, Some(@utf8.encode(value).length()))
       }
@@ -243,7 +246,7 @@ fn minimum_bytes_kind(
       Some(total)
     }
     Choice(alternatives) => {
-      let mut result : Int? = None
+      let mut result : Int32? = None
       for item in alternatives {
         result = min_optional(result, costs[item.rule.value()])
       }
@@ -263,8 +266,8 @@ fn minimum_bytes_kind(
 fn minimum_nodes_kind(
   grammar : Grammar,
   kind : RuleKind,
-  costs : FixedArray[Int?],
-) -> Int? {
+  costs : FixedArray[Int32?],
+) -> Int32? {
   match kind {
     Literal(_) | Bytes(_) | Integer(_, _) | Dictionary(_) => Some(1)
     Sequence(children) => {
@@ -282,7 +285,7 @@ fn minimum_nodes_kind(
       Some(total)
     }
     Choice(alternatives) => {
-      let mut child_cost : Int? = None
+      let mut child_cost : Int32? = None
       for item in alternatives {
         child_cost = min_optional(child_cost, costs[item.rule.value()])
       }
@@ -353,8 +356,8 @@ fn compute_fixed_point(
 ///|
 fn compute_cost_fixed_point(
   grammar : Grammar,
-  values : FixedArray[Int?],
-  evaluate : (Grammar, RuleKind, FixedArray[Int?]) -> Int?,
+  values : FixedArray[Int32?],
+  evaluate : (Grammar, RuleKind, FixedArray[Int32?]) -> Int32?,
 ) -> Unit {
   let mut changed = true
   let mut rounds = 0
@@ -385,8 +388,8 @@ pub fn Grammar::analyze(self : Grammar) -> GrammarAnalysis {
   let reachable = FixedArray::make(count, false)
   let nullable = FixedArray::make(count, false)
   let productive = FixedArray::make(count, false)
-  let minimum_bytes : FixedArray[Int?] = FixedArray::make(count, None)
-  let minimum_nodes : FixedArray[Int?] = FixedArray::make(count, None)
+  let minimum_bytes : FixedArray[Int32?] = FixedArray::make(count, None)
+  let minimum_nodes : FixedArray[Int32?] = FixedArray::make(count, None)
   mark_reachable(self, self.start(), reachable)
   compute_fixed_point(self, nullable, nullable_kind)
   compute_fixed_point(self, productive, productive_kind)

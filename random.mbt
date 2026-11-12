@@ -5,7 +5,7 @@
 pub(all) struct Random {
   mut state : Int64
   initial_seed : Int64
-  mut draws : Int
+  mut draws : Int32
 }
 
 ///|
@@ -31,19 +31,19 @@ pub fn Random::seed(self : Random) -> Int64 {
 }
 
 ///|
-pub fn Random::draw_count(self : Random) -> Int {
+pub fn Random::draw_count(self : Random) -> Int32 {
   self.draws
 }
 
 ///|
-pub fn Random::next_raw(self : Random) -> Int {
+pub fn Random::next_raw(self : Random) -> Int32 {
   self.state = self.state * 48271L % 2147483647L
   self.draws += 1
   self.state.to_int()
 }
 
 ///|
-pub fn Random::below(self : Random, exclusive : Int) -> Int {
+pub fn Random::below(self : Random, exclusive : Int32) -> Int32 {
   if exclusive <= 0 {
     0
   } else {
@@ -52,7 +52,11 @@ pub fn Random::below(self : Random, exclusive : Int) -> Int {
 }
 
 ///|
-pub fn Random::between(self : Random, minimum : Int, maximum : Int) -> Int {
+pub fn Random::between(
+  self : Random,
+  minimum : Int32,
+  maximum : Int32,
+) -> Int32 {
   if maximum <= minimum {
     minimum
   } else {
@@ -67,8 +71,8 @@ pub fn Random::between(self : Random, minimum : Int, maximum : Int) -> Int {
 ///|
 pub fn Random::chance(
   self : Random,
-  numerator : Int,
-  denominator : Int,
+  numerator : Int32,
+  denominator : Int32,
 ) -> Bool {
   if numerator <= 0 || denominator <= 0 {
     false
@@ -80,7 +84,7 @@ pub fn Random::chance(
 }
 
 ///|
-pub fn Random::choose_index(self : Random, length : Int) -> Int? {
+pub fn Random::choose_index(self : Random, length : Int32) -> Int32? {
   if length <= 0 {
     None
   } else {
@@ -89,7 +93,7 @@ pub fn Random::choose_index(self : Random, length : Int) -> Int? {
 }
 
 ///|
-pub fn Random::weighted_index(self : Random, weights : Array[Int]) -> Int? {
+pub fn Random::weighted_index(self : Random, weights : Array[Int32]) -> Int32? {
   let mut total = 0
   for weight in weights {
     if weight > 0 {
@@ -129,19 +133,19 @@ pub fn[T] Random::shuffle(self : Random, input : Array[T]) -> Array[T] {
 ///|
 pub fn Random::sample_without_replacement(
   self : Random,
-  population : Int,
-  requested : Int,
-) -> Array[Int] {
+  population : Int32,
+  requested : Int32,
+) -> Array[Int32] {
   if population <= 0 || requested <= 0 {
     return []
   }
-  let values : Array[Int] = []
+  let values : Array[Int32] = []
   for index = 0; index < population; index = index + 1 {
     values.push(index)
   }
   let shuffled = self.shuffle(values)
   let count = requested.min(population)
-  let result : Array[Int] = []
+  let result : Array[Int32] = []
   for index = 0; index < count; index = index + 1 {
     result.push(shuffled[index])
   }
@@ -149,7 +153,7 @@ pub fn Random::sample_without_replacement(
 }
 
 ///|
-pub fn Random::fork(self : Random, stream : Int) -> Random {
+pub fn Random::fork(self : Random, stream : Int32) -> Random {
   let mixed = Int64::from_int(self.next_raw()) +
     Int64::from_int(stream) * 104729L +
     self.initial_seed * 8191L
@@ -157,7 +161,7 @@ pub fn Random::fork(self : Random, stream : Int) -> Random {
 }
 
 ///|
-pub fn Random::advance(self : Random, count : Int) -> Unit {
+pub fn Random::advance(self : Random, count : Int32) -> Unit {
   for index = 0; index < count.max(0); index = index + 1 {
     ignore(self.next_raw())
   }
@@ -169,11 +173,12 @@ pub fn Random::snapshot(self : Random) -> RandomSnapshot {
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) struct RandomSnapshot {
   seed : Int64
   state : Int64
-  draws : Int
-} derive(Debug, Eq)
+  draws : Int32
+}
 
 ///|
 pub fn Random::restore(snapshot : RandomSnapshot) -> Random {
@@ -185,8 +190,8 @@ pub fn Random::restore(snapshot : RandomSnapshot) -> Random {
 }
 
 ///|
-pub fn deterministic_permutation(seed : Int64, size : Int) -> Array[Int] {
-  let values : Array[Int] = []
+pub fn deterministic_permutation(seed : Int64, size : Int32) -> Array[Int32] {
+  let values : Array[Int32] = []
   for index = 0; index < size.max(0); index = index + 1 {
     values.push(index)
   }

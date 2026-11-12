@@ -77,7 +77,7 @@ fn expression_target() -> @grammata.Target {
 }
 
 ///|
-fn run_expression_demo(executions : Int) -> @grammata.CampaignResult {
+fn run_expression_demo(executions : Int32) -> @grammata.CampaignResult {
   let config : @grammata.CampaignConfig = {
     ..@grammata.CampaignConfig::default(seed=20260918L),
     executions,

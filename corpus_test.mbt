@@ -1,5 +1,5 @@
 ///|
-fn literal_tree(value : String, id : Int) -> DerivationTree {
+fn literal_tree(value : String, id : Int32) -> DerivationTree {
   let payload : Array[Byte] = []
   for byte in @utf8.encode(value) {
     payload.push(byte)

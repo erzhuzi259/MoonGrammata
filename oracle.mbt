@@ -1,9 +1,10 @@
 ///|
+#derive(Debug, Eq)
 pub(all) enum DifferentialPolicy {
   CompareDisposition
   CompareResultDigest
   CompareDispositionAndDigest
-} derive(Debug, Eq)
+}
 
 ///|
 fn disposition_class(value : ExecutionDisposition) -> String {
@@ -67,7 +68,7 @@ pub fn differential_target(
   name : String,
   left : Target,
   right : Target,
-  policy? : DifferentialPolicy = CompareDispositionAndDigest,
+  policy~ : DifferentialPolicy = CompareDispositionAndDigest,
 ) -> Target {
   Target::new(name, input => {
     let left_result = left.run(input)
@@ -168,13 +169,13 @@ pub fn metamorphic_target(
 pub fn agreement_target(
   name : String,
   targets : Array[Target],
-  minimum_agreement? : Int = 2,
+  minimum_agreement~ : Int32 = 2,
 ) -> Target {
   Target::new(name, input => {
     if targets.is_empty() {
       return failed("agreement-configuration", "no targets")
     }
-    let counts : @hashmap.HashMap[String, Int] = @hashmap.HashMap([])
+    let counts : @hashmap.HashMap[String, Int32] = @hashmap.HashMap([])
     let features : Array[Feature] = []
     let mut best_key = ""
     let mut best_count = 0

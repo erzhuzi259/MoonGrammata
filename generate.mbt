@@ -1,10 +1,11 @@
 ///|
+#derive(Debug, Eq)
 pub(all) struct GenerationBudget {
-  max_depth : Int
-  max_nodes : Int
-  max_bytes : Int
-  max_repeat : Int
-} derive(Debug, Eq)
+  max_depth : Int32
+  max_nodes : Int32
+  max_bytes : Int32
+  max_repeat : Int32
+}
 
 ///|
 pub fn GenerationBudget::default() -> GenerationBudget {
@@ -13,33 +14,34 @@ pub fn GenerationBudget::default() -> GenerationBudget {
 
 ///|
 pub fn GenerationBudget::new(
-  max_depth? : Int = 32,
-  max_nodes? : Int = 512,
-  max_bytes? : Int = 16384,
-  max_repeat? : Int = 64,
+  max_depth~ : Int32 = 32,
+  max_nodes~ : Int32 = 512,
+  max_bytes~ : Int32 = 16384,
+  max_repeat~ : Int32 = 64,
 ) -> GenerationBudget {
   { max_depth, max_nodes, max_bytes, max_repeat, }
 }
 
 ///|
+#derive(Debug, Eq)
 pub(all) enum GenerationError {
   InvalidBudget(String)
   UnproductiveGrammar(AnalysisError)
-  DepthBudgetExceeded(Int)
-  NodeBudgetExceeded(Int)
-  ByteBudgetExceeded(Int)
-  NoViableAlternative(Int)
-  InvalidGeneratedInteger(Int, Int)
-} derive(Debug, Eq)
+  DepthBudgetExceeded(Int32)
+  NodeBudgetExceeded(Int32)
+  ByteBudgetExceeded(Int32)
+  NoViableAlternative(Int32)
+  InvalidGeneratedInteger(Int32, Int32)
+}
 
 ///|
 priv struct GenerationState {
   random : Random
   budget : GenerationBudget
   analysis : GrammarAnalysis
-  mut nodes : Int
-  mut bytes : Int
-  mut next_node_id : Int
+  mut nodes : Int32
+  mut bytes : Int32
+  mut next_node_id : Int32
 }
 
 ///|
@@ -62,8 +64,8 @@ fn GenerationBudget::validate(
 ///|
 fn GenerationState::reserve_node(
   self : GenerationState,
-  depth : Int,
-) -> Result[Int, GenerationError] {
+  depth : Int32,
+) -> Result[Int32, GenerationError] {
   if depth > self.budget.max_depth {
     return Err(DepthBudgetExceeded(self.budget.max_depth))
   }
@@ -79,7 +81,7 @@ fn GenerationState::reserve_node(
 ///|
 fn GenerationState::reserve_bytes(
   self : GenerationState,
-  count : Int,
+  count : Int32,
 ) -> Result[Unit, GenerationError] {
   if count < 0 || self.bytes > self.budget.max_bytes - count {
     Err(ByteBudgetExceeded(self.budget.max_bytes))
@@ -99,7 +101,7 @@ fn string_bytes(value : String) -> Array[Byte] {
 }
 
 ///|
-fn viable_child(state : GenerationState, rule : RuleId, depth : Int) -> Bool {
+fn viable_child(state : GenerationState, rule : RuleId, depth : Int32) -> Bool {
   let properties = state.analysis.properties(rule).unwrap()
   if !properties.productive {
     return false
@@ -117,7 +119,7 @@ fn viable_child(state : GenerationState, rule : RuleId, depth : Int) -> Bool {
 fn generate_leaf(
   state : GenerationState,
   rule : RuleId,
-  node_id : Int,
+  node_id : Int32,
   kind : DerivationKind,
   payload : Array[Byte],
 ) -> Result[DerivationTree, GenerationError] {
@@ -132,7 +134,7 @@ fn generate_rule(
   grammar : Grammar,
   state : GenerationState,
   rule : RuleId,
-  depth : Int,
+  depth : Int32,
 ) -> Result[DerivationTree, GenerationError] {
   let node_id = match state.reserve_node(depth) {
     Err(error) => return Err(error)
@@ -182,7 +184,7 @@ fn generate_rule(
     }
     Choice(alternatives) => {
       let candidates : Array[Alternative] = []
-      let weights : Array[Int] = []
+      let weights : Array[Int32] = []
       for item in alternatives {
         if viable_child(state, item.rule, depth + 1) {
           candidates.push(item)
@@ -263,7 +265,7 @@ fn generate_rule(
 pub fn Grammar::generate(
   self : Grammar,
   seed~ : Int64,
-  budget? : GenerationBudget = GenerationBudget::default(),
+  budget~ : GenerationBudget = GenerationBudget::default(),
 ) -> Result[DerivationTree, GenerationError] {
   match budget.validate() {
     Err(error) => return Err(error)
@@ -291,7 +293,7 @@ pub fn Grammar::generate_from(
   self : Grammar,
   rule : RuleId,
   seed~ : Int64,
-  budget? : GenerationBudget = GenerationBudget::default(),
+  budget~ : GenerationBudget = GenerationBudget::default(),
 ) -> Result[DerivationTree, GenerationError] {
   match self.rule(rule) {
     None => return Err(NoViableAlternative(rule.value()))

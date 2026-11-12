@@ -1,5 +1,5 @@
 ///|
-extern "C" fn process_exit(code : Int) = "exit"
+extern "C" fn process_exit(code : Int32) = "exit"
 
 ///|
 fn usage() -> String {
@@ -32,7 +32,7 @@ fn config_grammar() -> @grammata.Grammar {
 }
 
 ///|
-fn count_byte(input : Bytes, wanted : Int) -> Int {
+fn count_byte(input : Bytes, wanted : Int32) -> Int32 {
   let mut count = 0
   for byte in input {
     if byte.to_int() == wanted {
@@ -66,7 +66,7 @@ fn config_target() -> @grammata.Target {
 }
 
 ///|
-fn parse_positive(name : String, text : String) -> Result[Int, String] {
+fn parse_positive(name : String, text : String) -> Result[Int32, String] {
   let value = @string.parse_int(text) catch {
     _ => return Err(name + " must be an integer")
   }
